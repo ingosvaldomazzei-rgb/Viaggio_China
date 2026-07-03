@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<meta name="ext-resource-dependency" content="photos/beijing.jpg" data-resource-id="photo-beijing">
+<meta name="ext-resource-dependency" content="photos/xian.jpg" data-resource-id="photo-xian">
+<meta name="ext-resource-dependency" content="photos/longmen.jpg" data-resource-id="photo-longmen">
+<meta name="ext-resource-dependency" content="photos/chengdu.jpg" data-resource-id="photo-chengdu">
+<meta name="ext-resource-dependency" content="photos/chongqing.jpg" data-resource-id="photo-chongqing">
+<meta name="ext-resource-dependency" content="photos/zhangjiajie.jpg" data-resource-id="photo-zhangjiajie">
+<meta name="ext-resource-dependency" content="photos/furong.jpg" data-resource-id="photo-furong">
+<meta name="ext-resource-dependency" content="photos/fenghuang.jpg" data-resource-id="photo-fenghuang">
+<meta name="ext-resource-dependency" content="photos/guilin.jpg" data-resource-id="photo-guilin">
+<meta name="ext-resource-dependency" content="photos/yangshuo.jpg" data-resource-id="photo-yangshuo">
+<meta name="ext-resource-dependency" content="photos/bajiaozhai.jpg" data-resource-id="photo-bajiaozhai">
+<meta name="ext-resource-dependency" content="photos/shanghai.jpg" data-resource-id="photo-shanghai">
+<meta name="ext-resource-dependency" content="photos/suzhou.jpg" data-resource-id="photo-suzhou">
+<meta name="ext-resource-dependency" content="photos/tongli.jpg" data-resource-id="photo-tongli">
+<meta name="ext-resource-dependency" content="photos/hangzhou.jpg" data-resource-id="photo-hangzhou">
+<meta name="ext-resource-dependency" content="photos/xixi.jpg" data-resource-id="photo-xixi">
+<meta name="ext-resource-dependency" content="photos/qiandao.jpg" data-resource-id="photo-qiandao">
+<meta name="ext-resource-dependency" content="photos/wuzhen.jpg" data-resource-id="photo-wuzhen">
+<meta name="ext-resource-dependency" content="photos/hongkong.jpg" data-resource-id="photo-hongkong">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./image-slot.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: 'Manrope', system-ui, sans-serif; background: #E9E2D3; }
+  #chinamap { background: #DCE6EA; }
+  #chinamap .leaflet-control-zoom a { background: #FFFDF8; color: #3A342E; border: none; }
+  #chinamap .leaflet-bar { border: none; box-shadow: 0 4px 16px rgba(0,0,0,.14); border-radius: 12px; overflow: hidden; }
+  #chinamap .leaflet-control-attribution { background: rgba(255,253,248,.72); font-family: 'Manrope', sans-serif; font-size: 10px; }
+  .cn-tip { background: #211C18; color: #F7F2E8; border: none; box-shadow: 0 3px 10px rgba(0,0,0,.3); font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 7px; }
+  .cn-tip::before { display: none; }
+  .scrolly::-webkit-scrollbar { width: 8px; }
+  .scrolly::-webkit-scrollbar-thumb { background: #D6CBB4; border-radius: 8px; }
+  .scrolly::-webkit-scrollbar-track { background: transparent; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="200" rx="28" fill="#C0392B"/>
+    <g transform="translate(100 96)">
+      <path d="M0 -42 C 26 -42 42 -24 42 0 C 42 28 12 52 0 66 C -12 52 -42 28 -42 0 C -42 -24 -26 -42 0 -42 Z" fill="#F7F2E8"/>
+      <circle cx="0" cy="-4" r="16" fill="#C0392B"/>
+    </g>
+  </svg>
+</template>
+<div style="position:relative;width:100vw;height:100vh;overflow:hidden;color:#211C18;">
+
+  <div id="chinamap" ref="{{ mapRef }}" style="position:absolute;inset:0;z-index:1;"></div>
+
+  <!-- LEFT: routes / regions -->
+  <div style="position:absolute;top:20px;left:20px;bottom:20px;width:364px;z-index:20;display:flex;flex-direction:column;background:rgba(247,242,232,.95);backdrop-filter:blur(10px);border:1px solid #E3DBCC;border-radius:20px;box-shadow:0 18px 50px rgba(40,32,22,.22);overflow:hidden;">
+    <div style="padding:22px 24px 14px;border-bottom:1px solid #E7DFCF;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:11px;letter-spacing:.22em;font-weight:700;color:#B23A2E;text-transform:uppercase;">Mappa del viaggio</div>
+          <div style="display:flex;align-items:baseline;gap:11px;margin-top:6px;">
+            <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:38px;line-height:1;margin:0;color:#211C18;">Cina</h1>
+            <span style="font-family:'Spectral',serif;font-size:24px;color:#B7AC97;">中国</span>
+          </div>
+        </div>
+        <span style="flex:none;margin-top:4px;background:#EFE3CE;color:#8A6A2E;border:1px solid #E4D2B0;padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:700;">🍂 Fine ottobre</span>
+      </div>
+      <p style="margin:12px 0 0;font-size:13px;line-height:1.5;color:#6E655A;">{{ count }} luoghi · {{ regionCount }} aree · {{ routeCount }} percorsi possibili, tutti da Pechino a Shanghai o Hong Kong.</p>
+
+      <div style="display:flex;gap:6px;margin-top:14px;">
+        <button onClick="{{ tabPercorsi }}" style="flex:1;padding:9px;border-radius:10px;border:1px solid {{ tabPercorsiBorder }};background:{{ tabPercorsiBg }};color:{{ tabPercorsiFg }};font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Manrope',sans-serif;">Percorsi</button>
+        <button onClick="{{ tabAree }}" style="flex:1;padding:9px;border-radius:10px;border:1px solid {{ tabAreeBorder }};background:{{ tabAreeBg }};color:{{ tabAreeFg }};font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Manrope',sans-serif;">Tutte le aree</button>
+      </div>
+    </div>
+
+    <div class="scrolly" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 12px 10px;">
+
+      <div style="display:{{ percorsiDisplay }};">
+        <sc-for list="{{ routes }}" as="route" hint-placeholder-count="5">
+          <div style="margin-bottom:9px;border:1.5px solid {{ route.borderColor }};border-radius:14px;overflow:hidden;background:#FFFDF8;">
+            <button onClick="{{ route.toggle }}" style="width:100%;text-align:left;border:none;background:transparent;cursor:pointer;padding:12px 13px;display:flex;align-items:center;gap:11px;">
+              <span style="flex:none;width:26px;height:26px;border-radius:50%;background:{{ route.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:'Manrope',sans-serif;">{{ route.n }}</span>
+              <span style="flex:1;min-width:0;">
+                <span style="display:block;font-family:'Spectral',serif;font-weight:600;font-size:15px;color:#211C18;line-height:1.25;">{{ route.title }}</span>
+                <span style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
+                  <span style="font-size:10.5px;font-weight:700;color:{{ route.color }};">🏁 {{ route.closeAt }}</span>
+                  <span style="font-size:10.5px;color:#A99E8A;">· {{ route.stopCount }} tappe · ~{{ route.totalKm }} km</span>
+                </span>
+              </span>
+              <span style="flex:none;font-size:14px;color:#B8AD97;">{{ route.chevron }}</span>
+            </button>
+            <div style="display:{{ route.bodyDisplay }};padding:0 13px 13px;">
+              <sc-for list="{{ route.chain }}" as="node" hint-placeholder-count="5">
+                <div>
+                  <div style="display:{{ node.segDisplay }};align-items:center;gap:7px;padding:4px 0 4px 11px;color:#8A8071;">
+                    <span style="font-size:12px;color:{{ route.color }};">↓</span>
+                    <span style="font-size:11px;font-weight:600;color:#5F564B;">{{ node.seg.mode }}</span>
+                    <span style="font-size:11px;color:#A99E8A;">· ~{{ node.seg.km }} km · {{ node.seg.time }}</span>
+                  </div>
+                  <button onClick="{{ node.onClick }}" style="width:100%;text-align:left;border:1px solid #EDE5D3;background:#FBF8F1;cursor:pointer;padding:7px 10px;border-radius:10px;display:flex;align-items:center;gap:9px;" style-hover="background:#F3ECDC;">
+                    <span style="flex:none;width:20px;height:20px;border-radius:50%;background:{{ route.color }};color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;">{{ node.order }}</span>
+                    <span style="flex:1;font-family:'Spectral',serif;font-size:14px;font-weight:600;color:#211C18;">{{ node.name }}</span>
+                    <span style="flex:none;font-size:10.5px;color:#8A8071;">{{ node.daysLabel }}</span>
+                  </button>
+                </div>
+              </sc-for>
+              <p style="font-size:11.5px;line-height:1.5;color:#8A8071;margin:9px 1px 0;">{{ route.note }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:{{ areeDisplay }};">
+        <sc-for list="{{ regions }}" as="region" hint-placeholder-count="6">
+          <div style="margin-bottom:4px;">
+            <button onClick="{{ region.toggle }}" style="width:100%;text-align:left;border:none;background:transparent;cursor:pointer;padding:10px 12px 6px;display:flex;align-items:center;gap:10px;opacity:{{ region.headerOpacity }};" style-hover="background:#EFE8D8;border-radius:10px;">
+              <span style="flex:none;width:11px;height:11px;border-radius:3px;background:{{ region.color }};"></span>
+              <span style="flex:1;font-size:11px;letter-spacing:.14em;font-weight:700;color:#5F564B;text-transform:uppercase;">{{ region.name }}</span>
+              <span style="flex:none;font-size:11px;color:#A99E8A;font-weight:600;">{{ region.count }}</span>
+              <span style="flex:none;font-size:12px;color:#B8AD97;">{{ region.eye }}</span>
+            </button>
+            <div style="display:{{ region.childDisplay }};">
+              <sc-for list="{{ region.places }}" as="place" hint-placeholder-count="3">
+                <button onClick="{{ place.onClick }}" style="width:100%;text-align:left;border:none;background:transparent;cursor:pointer;padding:8px 12px;border-radius:12px;display:flex;align-items:center;gap:12px;transition:background .15s;" style-hover="background:#EFE8D8;">
+                  <span style="flex:none;width:12px;height:12px;border-radius:50%;background:{{ place.color }};border:2px solid #F7F2E8;box-shadow:0 0 0 1px rgba(0,0,0,.08);"></span>
+                  <span style="flex:1;min-width:0;">
+                    <span style="display:flex;align-items:baseline;gap:7px;">
+                      <span style="font-family:'Spectral',serif;font-size:16px;font-weight:600;color:#211C18;">{{ place.name }}</span>
+                      <span style="font-size:12px;color:#B7AC97;font-family:'Spectral',serif;">{{ place.cnName }}</span>
+                    </span>
+                    <span style="display:block;font-size:11.5px;color:#8A8071;margin-top:1px;">{{ place.typeLabel }} · {{ place.daysLabel }}</span>
+                  </span>
+                  <span style="flex:none;color:#C9BFA9;font-size:15px;">›</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+    </div>
+
+    <div style="padding:12px 16px;border-top:1px solid #E7DFCF;">
+      <button onClick="{{ showAll }}" style="width:100%;border:1px solid #D8CEB9;background:#FFFDF8;cursor:pointer;padding:11px;border-radius:13px;font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;letter-spacing:.02em;color:#3A342E;display:flex;align-items:center;justify-content:center;gap:8px;" style-hover="background:#F3ECDC;">
+        <span style="color:#B23A2E;">◎</span> Inquadra tutta la Cina
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT: detail drawer -->
+  <div style="position:absolute;top:20px;right:20px;bottom:20px;width:428px;z-index:20;background:#F7F2E8;border:1px solid #E3DBCC;border-radius:20px;box-shadow:0 18px 50px rgba(40,32,22,.28);overflow:hidden;display:flex;flex-direction:column;transform:{{ drawerTransform }};transition:transform .5s cubic-bezier(.32,.72,0,1);">
+    <div style="height:6px;background:var(--sel,#B23A2E);"></div>
+    <div style="display:flex;justify-content:flex-end;padding:12px 14px 0;">
+      <button onClick="{{ close }}" aria-label="Chiudi" style="width:34px;height:34px;border-radius:50%;border:1px solid #E3DBCC;background:#FFFDF8;cursor:pointer;font-size:16px;color:#6B625A;display:flex;align-items:center;justify-content:center;" style-hover="background:#EFE8D8;">✕</button>
+    </div>
+    <div class="scrolly" style="flex:1;overflow-y:auto;padding:2px 26px 28px;">
+      <sc-for list="{{ places }}" as="place" hint-placeholder-count="1">
+        <div style="display:{{ place.panelDisplay }};flex-direction:column;animation:fadeUp .4s ease;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="width:10px;height:10px;border-radius:50%;background:{{ place.color }};"></span>
+            <span style="font-size:11px;letter-spacing:.18em;font-weight:700;color:{{ place.color }};text-transform:uppercase;">{{ place.regionName }}</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;margin-top:8px;">
+            <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:33px;line-height:1.05;margin:0;">{{ place.name }}</h2>
+            <span style="font-family:'Spectral',serif;font-size:22px;color:#B7AC97;">{{ place.cnName }}</span>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#EDE5D3;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#5F564B;">{{ place.typeLabel }}</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#EDE5D3;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#5F564B;"><span style="color:var(--sel,#B23A2E);">◷</span> {{ place.daysLabel }}</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#EDE5D3;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#5F564B;"><span style="color:#2E7D64;">☀</span> {{ place.bestTime }}</span>
+          </div>
+
+          <div style="font-size:11px;letter-spacing:.16em;font-weight:700;color:#8A8071;text-transform:uppercase;margin:20px 0 9px;">Foto <span style="font-weight:600;letter-spacing:0;text-transform:none;color:#A99E8A;">· trascina le tue immagini per sostituire</span></div>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <image-slot id="{{ place.photoA }}" src="{{ place.heroSrc }}" style="width:100%;height:150px;" shape="rounded" radius="14" placeholder="Trascina una foto"></image-slot>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;">
+              <image-slot id="{{ place.photoB }}" style="width:100%;height:82px;" shape="rounded" radius="12" placeholder="+ Foto"></image-slot>
+              <image-slot id="{{ place.photoC }}" style="width:100%;height:82px;" shape="rounded" radius="12" placeholder="+ Foto"></image-slot>
+              <image-slot id="{{ place.photoD }}" style="width:100%;height:82px;" shape="rounded" radius="12" placeholder="+ Foto"></image-slot>
+            </div>
+          </div>
+
+          <p style="font-size:14.5px;line-height:1.62;color:#4A423A;margin:20px 0 0;text-wrap:pretty;">{{ place.description }}</p>
+
+          <div style="font-size:11px;letter-spacing:.16em;font-weight:700;color:#8A8071;text-transform:uppercase;margin:24px 0 10px;">Da non perdere</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px;">
+            <sc-for list="{{ place.highlights }}" as="h" hint-placeholder-count="4">
+              <span style="background:#FFFDF8;border:1px solid #E3DBCC;padding:6px 11px;border-radius:9px;font-size:12.5px;font-weight:500;color:#443C34;">{{ h }}</span>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:24px;background:#FFFDF8;border:1px solid #E7DFCF;border-radius:14px;padding:15px 16px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--sel,#B23A2E);text-transform:uppercase;">🧭 Come arrivarci</div>
+            <p style="font-size:13.5px;line-height:1.55;color:#4A423A;margin:8px 0 0;">{{ place.howToGet }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;mapStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Colori&quot;,&quot;options&quot;:[&quot;Colori&quot;,&quot;Minimal&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Mappa&quot;},&quot;labelsAlways&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Mappa&quot;}}">
+class Component extends DCLogic {
+  state = { selected: null, hidden: {}, panel: 'percorsi', activeRoute: null };
+
+  buildRegions() {
+    return [
+      { id:'nord', name:'Nord · Pechino', color:'#C0392B', places:[
+        { id:'beijing', name:'Pechino', cnName:'北京', coords:[39.9042,116.4074], type:'Città', days:4, bestTime:'Ott: ideale',
+          description:"Cuore politico e millenario della Cina. Si passa dalla sterminata Piazza Tienanmen ai cortili della Città Proibita, dai vicoli (hutong) in risciò ai tratti più panoramici della Grande Muraglia come Mutianyu o Jinshanling. Da mettere in conto almeno un'intera giornata per la Muraglia.",
+          highlights:['Città Proibita','Grande Muraglia (Mutianyu)','Tempio del Cielo','Hutong'],
+          howToGet:"Punto di partenza di tutti i percorsi: voli diretti dall'Italia e grande stazione dell'alta velocità." },
+      ]},
+      { id:'centro', name:'Centro · Xi\u2019an', color:'#C08A2D', places:[
+        { id:'xian', name:"Xi'an", cnName:'西安', coords:[34.3416,108.9398], type:'Città', days:2, bestTime:'Ott–Nov',
+          description:"Antica capitale di tredici dinastie e punto d'arrivo della Via della Seta. Il richiamo principale è l'Esercito di Terracotta, migliaia di guerrieri a grandezza naturale; in città si pedala sulle mura Ming perfettamente conservate e si cena tra lo street-food del Quartiere Musulmano.",
+          highlights:['Esercito di Terracotta','Mura antiche','Quartiere musulmano'],
+          howToGet:"Da Pechino treno ad alta velocità (~4h 30m) o volo (~2h)." },
+        { id:'longmen', name:'Grotte di Longmen', cnName:'龙门石窟', coords:[34.5559,112.4707], type:'Cultura', days:1, bestTime:'Ott–Nov',
+          description:"Uno dei grandi santuari rupestri buddhisti della Cina, patrimonio UNESCO: oltre centomila statue scavate per più di un chilometro nelle pareti lungo il fiume Yi, dominate dal colossale Buddha Vairocana. Si abbina facilmente a una sosta a Luoyang.",
+          highlights:['Grotte nella roccia','Grandi Buddha','Fiume Yi','UNESCO'],
+          howToGet:"Presso Luoyang: da Xi'an treno AV ~1h 30m, poi ~20 min in auto." },
+      ]},
+      { id:'sudovest', name:'Sud-ovest · Sichuan', color:'#2E7D64', places:[
+        { id:'chengdu', name:'Chengdu', cnName:'成都', coords:[30.5728,104.0668], type:'Città', days:3, bestTime:'Ott–Nov',
+          description:"La capitale rilassata del Sichuan, patria dei panda giganti e di una cucina tra le più piccanti del paese. Tra la base di ricerca dei panda, le case da tè nel parco, l'opera con il cambio di volto e la via Jinli, è la porta d'accesso a un ritmo di viaggio più lento.",
+          highlights:['Base dei Panda Giganti','Cucina del Sichuan','Monte Qingcheng','Via Jinli'],
+          howToGet:"Da Xi'an treno ad alta velocità (~4h)." },
+        { id:'chongqing', name:'Chongqing', cnName:'重庆', coords:[29.5630,106.5516], type:'Città', days:2, bestTime:'Ott–Nov',
+          description:"Megalopoli verticale abbarbicata sulle colline alla confluenza di due fiumi: grattacieli su più livelli, la monorotaia che attraversa i palazzi, hot pot bollente e il vecchio quartiere di Ciqikou. È anche il porto d'imbarco per le crociere lungo lo Yangtze e le Tre Gole.",
+          highlights:['Hot pot','Hongyadong','Ciqikou','Crociere sullo Yangtze'],
+          howToGet:"Da Chengdu treno ad alta velocità (~1h 15m)." },
+      ]},
+      { id:'hunan', name:'Ovest · Hunan', color:'#3A7D8C', places:[
+        { id:'zhangjiajie', name:'Zhangjiajie', cnName:'张家界', coords:[29.1174,110.4794], type:'Natura', days:3, bestTime:'Apr–Ott',
+          description:"Il parco che ha ispirato le montagne fluttuanti di Avatar: migliaia di pilastri di arenaria avvolti dalle nuvole, collegati da sentieri, funivie e ascensori panoramici scavati nella roccia. Poco distante, la Montagna Tianmen con la sua grotta ad arco e la passerella di vetro sospesa nel vuoto.",
+          highlights:['Parco di Wulingyuan','Montagna Tianmen','Ponte di vetro','Ascensore Bailong'],
+          howToGet:"Da Chongqing/Chengdu conviene il volo (~1h – 1h 30m)." },
+        { id:'furong', name:'Furong (città antica)', cnName:'芙蓉镇', coords:[28.7480,109.9930], type:'Borgo d\u2019acqua', days:1, bestTime:'Apr–Ott',
+          description:"Antico borgo dell'etnia Tujia costruito attorno a una cascata scenografica che precipita tra le case, da cui il soprannome di città sospesa sull'acqua. Vicoli lastricati, palafitte in legno e scorci sul fiume ne fanno una sosta suggestiva tra Zhangjiajie e Fenghuang.",
+          highlights:['Cascata nel borgo','Architettura Tujia','Vicoli in pietra'],
+          howToGet:"Da Zhangjiajie ~2h in auto o bus." },
+        { id:'fenghuang', name:'Fenghuang (città antica)', cnName:'凤凰古城', coords:[27.9497,109.5990], type:'Borgo d\u2019acqua', days:1, bestTime:'Apr–Nov',
+          description:"La città della fenice, uno dei borghi antichi più fotogenici della Cina: case su palafitte affacciate sul fiume Tuo, ponti coperti e vicoli di pietra. Di sera si accendono migliaia di lanterne rosse e i riflessi sull'acqua creano un'atmosfera fiabesca.",
+          highlights:['Case su palafitte','Fiume Tuo','Ponti antichi','Atmosfera notturna'],
+          howToGet:"Da Zhangjiajie ~3–4h in auto o bus." },
+      ]},
+      { id:'guangxi', name:'Sud · Guangxi', color:'#5E8C3A', places:[
+        { id:'guilin', name:'Guilin', cnName:'桂林', coords:[25.2736,110.2907], type:'Città', days:2, bestTime:'Apr–Ott',
+          description:"Città-base immersa nel paesaggio carsico più celebre del paese, tra colline a pan di zucchero e il fiume Li. Offre grotte spettacolari, laghi urbani con pagode illuminate e ottime connessioni verso Yangshuo e i villaggi dei dintorni.",
+          highlights:['Fiume Li','Collina della Proboscide','Grotte del Flauto di Canna'],
+          howToGet:"Da Zhangjiajie treno (~5h) o volo (~1h)." },
+        { id:'yangshuo', name:'Yangshuo', cnName:'阳朔', coords:[24.7791,110.4966], type:'Natura', days:2, bestTime:'Apr–Ott',
+          description:"Il regno dei pinnacoli carsici lungo il fiume Li: la crociera da Guilin regala gli scenari da dipinto che si ritrovano persino sulle banconote. Attorno, campi e terrazze di tè, villaggi rurali da girare in bici e lo spettacolo serale dei pescatori con i cormorani.",
+          highlights:['Fiume Li','Colline carsiche','Terrazze di tè','Cormorani'],
+          howToGet:"Da Guilin crociera sul fiume Li (~4–5h) o ~1h 30m in auto." },
+        { id:'bajiaozhai', name:'Parco di Bajiaozhai', cnName:'八角寨', coords:[26.1300,110.6500], type:'Natura', days:1, bestTime:'Apr–Nov',
+          description:"Un geoparco di formazioni Danxia: guglie di arenaria rossa a forma di petali e stelle che emergono dalla foresta, spesso avvolte dalla foschia. Sentieri e passerelle conducono a belvedere mozzafiato, in un angolo ancora poco turistico al confine tra Guangxi e Hunan.",
+          highlights:['Rilievi Danxia','Rocce a stella','Sentieri panoramici'],
+          howToGet:"Contea di Ziyuan: da Guilin ~2h 30m in auto." },
+      ]},
+      { id:'est', name:'Est · Delta dello Yangtze', color:'#3E5C9A', places:[
+        { id:'shanghai', name:'Shanghai', cnName:'上海', coords:[31.2304,121.4737], type:'Città', days:3, bestTime:'Ott–Nov',
+          description:"La metropoli più scintillante della Cina: sul Bund gli edifici coloniali guardano lo skyline futuristico di Pudong al di là del fiume. Tra il classico Giardino Yu, i caffè della Concessione Francese e i grattacieli panoramici, è un ottimo punto di partenza o di rientro.",
+          highlights:['Il Bund','Skyline di Pudong','Giardino Yu','Concessione Francese'],
+          howToGet:"Spesso il gran finale del viaggio: si raggiunge in treno AV da Hangzhou/Suzhou (~30–60 min) o in volo dalle tappe più lontane come Chengdu, Zhangjiajie o Guilin. Ottimo hub per il rientro in Italia." },
+        { id:'suzhou', name:'Suzhou', cnName:'苏州', coords:[31.2989,120.5853], type:'Città', days:1, bestTime:'Ott–Nov',
+          description:"La Venezia d'Oriente, celebre per i giardini classici patrimonio UNESCO: microcosmi di rocce, acqua e padiglioni concepiti come dipinti tridimensionali. Canali, ponti in pietra e l'antica tradizione della seta completano il fascino della città vecchia.",
+          highlights:['Giardini classici','Canali','Seta','Città vecchia'],
+          howToGet:"Da Shanghai treno ad alta velocità (~30 min)." },
+        { id:'tongli', name:'Tongli', cnName:'同里', coords:[31.1560,120.7250], type:'Borgo d\u2019acqua', days:1, bestTime:'Ott–Nov',
+          description:"Uno dei borghi d'acqua più armoniosi vicino a Suzhou: una rete di canali attraversati da ponti in pietra, case affacciate sull'acqua e il raffinato giardino Tuisi. Perfetto per una mezza giornata in barca a remi, lontano dalla folla.",
+          highlights:['Canali e ponti','Giardino Tuisi','Barche a remi'],
+          howToGet:"Vicino Suzhou: ~30 min in auto." },
+        { id:'hangzhou', name:'Hangzhou', cnName:'杭州', coords:[30.2741,120.1551], type:'Città', days:2, bestTime:'Ott–Nov',
+          description:"Elegante città sul Lago dell'Ovest, da secoli musa di poeti e pittori con i suoi ponti, i salici e le pagode. Attorno, le colline delle piantagioni di tè verde Longjing e il tempio Lingyin; è anche la base ideale per Xixi, il lago Qiandao e i borghi d'acqua.",
+          highlights:['Lago dell\u2019Ovest','Tè Longjing','Tempio Lingyin'],
+          howToGet:"Da Shanghai o Suzhou treno AV (~45m – 1h)." },
+        { id:'xixi', name:'Paludi di Xixi', cnName:'西溪湿地', coords:[30.2650,120.0700], type:'Natura', days:1, bestTime:'Ott–Nov',
+          description:"Una vasta riserva umida a due passi dal centro di Hangzhou: un labirinto di canali, stagni e canneti che si esplora in barchino tra aironi e ninfee. Un'oasi di quiete e natura, particolarmente bella con i colori dell'autunno.",
+          highlights:['Canali e stagni','Giri in barca','Birdwatching'],
+          howToGet:"A Hangzhou, ~30 min dal Lago dell'Ovest." },
+        { id:'qiandao', name:'Lago delle Mille Isole', cnName:'千岛湖', coords:[29.6050,119.0370], type:'Lago', days:1, bestTime:'Apr–Nov',
+          description:"Il Lago delle Mille Isole, un bacino dalle acque verde smeraldo punteggiato da oltre mille isolette boscose. Si visita in battello tra baie e sentieri ed è la fonte della celebre acqua minerale cinese: scenografico e rilassante.",
+          highlights:['Acqua verde smeraldo','Mille isole','Gite in battello'],
+          howToGet:"Da Hangzhou ~1h 30m in auto o treno." },
+        { id:'wuzhen', name:'Wuzhen', cnName:'乌镇', coords:[30.7450,120.4900], type:'Borgo d\u2019acqua', days:1, bestTime:'Ott–Nov',
+          description:"Tra i borghi d'acqua più belli e curati della Cina: canali secolari, ponticelli di pietra, laboratori artigiani e case dai tetti neri specchiate nell'acqua. Di sera l'illuminazione trasforma i vicoli in un set da sogno.",
+          highlights:['Canali storici','Case sull\u2019acqua','Illuminazione serale'],
+          howToGet:"Tra Hangzhou e Suzhou: ~1h in auto." },
+      ]},
+      { id:'hk', name:'Sud · Hong Kong', color:'#8A4E86', places:[
+        { id:'hongkong', name:'Hong Kong', cnName:'香港', coords:[22.3193,114.1694], type:'Città', days:3, bestTime:'Ott: perfetto',
+          description:"Metropoli verticale sospesa tra Oriente e Occidente: il colpo d'occhio dal Victoria Peak sul porto, lo Star Ferry, i mercati notturni e le isole verdi come Lantau. A fine ottobre la città vive Halloween con grande intensità, dai locali di Lan Kwai Fong agli eventi a tema di Ocean Park e Disneyland: un motivo in più per inserirla nel viaggio.",
+          highlights:['Victoria Peak','Star Ferry e skyline','Halloween a Lan Kwai Fong','Ocean Park / Disneyland','Isola di Lantau'],
+          howToGet:"Da Guilin/Yangshuo treno alta velocità (~5h) o volo (~1h 30m); anche da Shanghai in volo (~2h)." },
+      ]},
+    ];
+  }
+
+  buildRoutes() {
+    return [
+      { id:'r1', title:"Xi'an & Luoyang → Shanghai", closeAt:'Shanghai', color:'#B23A2E',
+        stops:['beijing','xian','longmen','hangzhou','wuzhen','shanghai'],
+        note:"In zona Shanghai puoi aggiungere 1-2 tappe extra: Suzhou, Tongli, le Paludi di Xixi o il Lago delle Mille Isole." },
+      { id:'r2', title:'Zhangjiajie → Shanghai', closeAt:'Shanghai', color:'#3A7D8C',
+        stops:['beijing','zhangjiajie','furong','fenghuang','hangzhou','wuzhen','shanghai'],
+        note:"Furong e Fenghuang si possono visitare entrambe o sceglierne una sola. In zona Shanghai valgono le stesse estensioni (Suzhou, Tongli, Xixi, Lago delle Mille Isole)." },
+      { id:'r3', title:'Chengdu & Chongqing → Shanghai', closeAt:'Shanghai', color:'#2E7D64',
+        stops:['beijing','xian','chengdu','chongqing','hangzhou','wuzhen','shanghai'],
+        note:"Il percorso più lungo (aggiunge Sichuan e panda). Da Xi'an si può deviare anche su Luoyang/Longmen; in zona Shanghai valgono le stesse estensioni." },
+      { id:'r4', title:'Guilin & Yangshuo → Hong Kong', closeAt:'Hong Kong', color:'#8A4E86',
+        stops:['beijing','guilin','yangshuo','hongkong'],
+        note:"Da Guilin è possibile deviare di un giorno verso il parco di Bajiaozhai. Il percorso più corto: ideale se Hong Kong con Halloween è la priorità." },
+      { id:'r5', title:'Guilin & Yangshuo → Shanghai', closeAt:'Shanghai', color:'#C08A2D',
+        stops:['beijing','guilin','yangshuo','hangzhou','wuzhen','shanghai'],
+        note:"Stessa introduzione della rotta precedente ma chiudendo a Shanghai invece di Hong Kong. Anche qui possibile deviare su Bajiaozhai da Guilin." },
+    ];
+  }
+
+  segLookup() {
+    if (!this._seg) {
+      this._seg = {
+        'beijing>xian': { mode:'Treno alta velocità', km:1200, time:'~4h 30m' },
+        'xian>longmen': { mode:'Treno alta velocità', km:360, time:'~1h 30m' },
+        'longmen>hangzhou': { mode:'Treno AV (cambio) o volo', km:1000, time:'~6h treno · ~2h volo' },
+        'beijing>zhangjiajie': { mode:'Volo', km:1200, time:'~2h 30m' },
+        'zhangjiajie>furong': { mode:'Auto', km:90, time:'~2h' },
+        'furong>fenghuang': { mode:'Auto', km:110, time:'~2h' },
+        'fenghuang>hangzhou': { mode:'Volo da Tongren + trasferimento', km:1050, time:'~3h totali' },
+        'xian>chengdu': { mode:'Treno alta velocità', km:700, time:'~4h' },
+        'chengdu>chongqing': { mode:'Treno alta velocità', km:300, time:'~1h 15m' },
+        'chongqing>hangzhou': { mode:'Volo', km:1500, time:'~2h 30m' },
+        'beijing>guilin': { mode:'Volo', km:1900, time:'~3h' },
+        'guilin>yangshuo': { mode:'Auto o crociera fiume Li', km:65, time:'~1h 30m auto · 4-5h crociera' },
+        'yangshuo>hongkong': { mode:'Treno alta velocità o volo', km:730, time:'~5h treno · 1h 30m volo' },
+        'yangshuo>hangzhou': { mode:'Rientro a Guilin + volo', km:1250, time:'~1h + 2h volo' },
+        'hangzhou>wuzhen': { mode:'Auto', km:80, time:'~1h 15m' },
+        'wuzhen>shanghai': { mode:'Auto o bus', km:120, time:'~1h 30m' },
+      };
+    }
+    return this._seg;
+  }
+
+  get regions() {
+    if (!this._regions) {
+      this._regions = this.buildRegions();
+      this._flat = [];
+      this._regions.forEach(r=>{
+        r.places.forEach((p)=>{
+          p.regionId = r.id; p.color = r.color; p.regionName = r.name;
+          this._flat.push(p);
+        });
+      });
+    }
+    return this._regions;
+  }
+  get flat() { this.regions; return this._flat; }
+  get routesRaw() { if (!this._routes) this._routes = this.buildRoutes(); return this._routes; }
+  byId(id) { return this.flat.find(p=>p.id===id); }
+
+  routeChain(route) {
+    const seg = this.segLookup();
+    return route.stops.map((id, i) => {
+      const p = this.byId(id);
+      const prev = i > 0 ? route.stops[i-1] : null;
+      const s = prev ? (seg[prev+'>'+id] || { mode:'Collegamento da definire', km:0, time:'' }) : null;
+      return {
+        id: p.id, name: p.name, order: i+1,
+        daysLabel: p.days + (p.days===1?' giorno':' giorni'),
+        segDisplay: s ? 'flex' : 'none', seg: s || { mode:'', km:0, time:'' },
+        onClick: ()=>this.select(p.id),
+      };
+    });
+  }
+
+  componentDidMount() { this.tryInit(); }
+  componentDidUpdate(prev) {
+    if (!this.map) { this.tryInit(); return; }
+    if (prev.props && prev.props.mapStyle !== this.props.mapStyle) this.swapTiles();
+    if (prev.props && prev.props.labelsAlways !== this.props.labelsAlways) this.rebindTips();
+  }
+
+  tryInit(tries) {
+    tries = tries || 0;
+    if (this.map) return;
+    if (window.L && this.mapEl) {
+      try { this.initMap(); return; }
+      catch (e) { this.map = null; }
+    }
+    if (tries > 150) return;
+    setTimeout(()=>this.tryInit(tries+1), 100);
+  }
+
+  tileUrl() {
+    return this.props.mapStyle === 'Minimal'
+      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  }
+  addTiles() {
+    this.tiles = window.L.tileLayer(this.tileUrl(), { subdomains:'abcd', maxZoom:18, attribution:'© OpenStreetMap · © CARTO' }).addTo(this.map);
+  }
+  swapTiles() { if (this.tiles) this.map.removeLayer(this.tiles); this.addTiles(); this.tiles.bringToBack(); }
+
+  icon(p) {
+    const activeRoute = this.state.activeRoute;
+    const selected = this.state.selected === p.id;
+    if (activeRoute) {
+      const route = this.routesRaw.find(r=>r.id===activeRoute);
+      const idx = route ? route.stops.indexOf(p.id) : -1;
+      if (idx >= 0) {
+        const size = selected ? 30 : 24;
+        const html = '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+route.color+';color:#fff;font-family:Manrope,sans-serif;font-weight:700;font-size:'+(selected?13:11)+'px;display:flex;align-items:center;justify-content:center;border:'+(selected?3:2.5)+'px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.45);">'+(idx+1)+'</div>';
+        return window.L.divIcon({ className:'', html, iconSize:[size,size], iconAnchor:[size/2,size/2] });
+      }
+      const size = 9;
+      const html = '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+p.color+';opacity:.35;border:1.5px solid #fff;"></div>';
+      return window.L.divIcon({ className:'', html, iconSize:[size,size], iconAnchor:[size/2,size/2] });
+    }
+    const size = selected ? 22 : 15;
+    const html = '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+p.color+';border:'+(selected?3:2.5)+'px solid #fff;box-shadow:0 2px 7px rgba(0,0,0,.4);'+(selected?'outline:3px solid '+p.color+'55;':'')+'"></div>';
+    return window.L.divIcon({ className:'', html, iconSize:[size,size], iconAnchor:[size/2,size/2] });
+  }
+  rebindTips() {
+    if (!this.markers) return;
+    const perm = this.props.labelsAlways === true;
+    this.flat.forEach(p=>{
+      const m = this.markers[p.id]; if (!m) return;
+      m.unbindTooltip();
+      m.bindTooltip(p.name, { permanent:perm, direction:'top', offset:[0,-6], className:'cn-tip' });
+    });
+  }
+  updateMarkers() {
+    if (!this.markers) return;
+    const activeRoute = this.state.activeRoute;
+    this.flat.forEach(p=>{
+      const m = this.markers[p.id]; if (!m) return;
+      if (activeRoute) {
+        if (!this.map.hasLayer(m)) m.addTo(this.map);
+        m.setIcon(this.icon(p));
+        return;
+      }
+      const hidden = !!this.state.hidden[p.regionId];
+      if (hidden) { if (this.map.hasLayer(m)) this.map.removeLayer(m); }
+      else { if (!this.map.hasLayer(m)) m.addTo(this.map); m.setIcon(this.icon(p)); }
+    });
+  }
+
+  initMap() {
+    const L = window.L;
+    if (!this.mapEl) return;
+    if (this.mapEl._leaflet_id) { try { this.mapEl._leaflet_id = null; this.mapEl.innerHTML = ''; } catch(e){} }
+    this.map = L.map(this.mapEl, { zoomControl:false, attributionControl:true, minZoom:3, worldCopyJump:true });
+    L.control.zoom({ position:'bottomright' }).addTo(this.map);
+    this.addTiles();
+    this.markers = {};
+    const perm = this.props.labelsAlways === true;
+    this.flat.forEach(p=>{
+      const m = L.marker(p.coords, { icon:this.icon(p) }).addTo(this.map);
+      m.bindTooltip(p.name, { permanent:perm, direction:'top', offset:[0,-6], className:'cn-tip' });
+      m.on('click', ()=>this.select(p.id));
+      this.markers[p.id] = m;
+    });
+    this.fitAllBounds(false);
+  }
+
+  fitAllBounds(animate) {
+    const b = window.L.latLngBounds(this.flat.map(p=>p.coords));
+    const opts = { paddingTopLeft: window.L.point(404,60), paddingBottomRight: window.L.point(70,70), duration:.9 };
+    try {
+      if (animate) this.map.flyToBounds(b, opts); else this.map.fitBounds(b, opts);
+    } catch (e) {
+      // Fall back to an instant (unanimated) fit if the fly animation path throws.
+      try { this.map.fitBounds(b, opts); } catch (e2) {}
+    }
+  }
+  fitRouteBounds(routeId) {
+    const route = this.routesRaw.find(r=>r.id===routeId);
+    if (!route || !this.map) return;
+    const b = window.L.latLngBounds(route.stops.map(id=>this.byId(id).coords));
+    const opts = { paddingTopLeft: window.L.point(404,60), paddingBottomRight: window.L.point(70,70), duration:.9 };
+    try {
+      this.map.flyToBounds(b, opts);
+    } catch (e) {
+      try { this.map.fitBounds(b, opts); } catch (e2) {}
+    }
+  }
+  flyToPin(coords, zoom) {
+    const p = this.map.project(coords, zoom);
+    p.x += 40;
+    this.map.flyTo(this.map.unproject(p, zoom), zoom, { duration:.9 });
+  }
+  // The route line is drawn as a hand-managed SVG polyline in Leaflet's
+  // overlayPane (below markerPane, so it sits under the pins automatically)
+  // instead of via L.polyline. Leaflet 1.9.4's Path/_clipPoints code throws
+  // ("Cannot read properties of undefined (reading 'x')") the first time a
+  // vector layer is added to a map that has so far only ever held DivIcon
+  // markers — reproducible even with noClip/SVG/Canvas renderers — so we
+  // sidestep its vector-layer system entirely for this one thin line.
+  ensureRouteLineEl() {
+    if (this._routePolyEl) return;
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const pane = this.map.getPane('overlayPane');
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('style', 'position:absolute;overflow:visible;pointer-events:none;left:0;top:0;');
+    const poly = document.createElementNS(svgNS, 'polyline');
+    poly.setAttribute('fill', 'none');
+    svg.appendChild(poly);
+    pane.appendChild(svg);
+    this._routeSvgEl = svg;
+    this._routePolyEl = poly;
+    this._routeGeomHandler = () => this.renderRouteLineGeometry();
+    this.map.on('move zoom viewreset', this._routeGeomHandler);
+  }
+  renderRouteLineGeometry() {
+    if (!this._routePolyEl) return;
+    if (!this._activeRouteLatLngs) { this._routePolyEl.setAttribute('points', ''); return; }
+    try {
+      const pts = this._activeRouteLatLngs.map(ll=>{
+        const p = this.map.latLngToLayerPoint(ll);
+        return p.x + ',' + p.y;
+      }).join(' ');
+      this._routePolyEl.setAttribute('points', pts);
+    } catch (e) {
+      // Transient mid-animation frame; the next move/zoom tick will retry.
+    }
+  }
+  drawRouteLine(routeId) {
+    const route = this.routesRaw.find(r=>r.id===routeId);
+    if (!route || !this.map) return;
+    this.ensureRouteLineEl();
+    this._activeRouteLatLngs = route.stops.map(id=>window.L.latLng(this.byId(id).coords));
+    this._routePolyEl.setAttribute('stroke', route.color);
+    this._routePolyEl.setAttribute('stroke-width', '3.5');
+    this._routePolyEl.setAttribute('stroke-dasharray', '2 10');
+    this._routePolyEl.setAttribute('stroke-linecap', 'round');
+    this._routePolyEl.setAttribute('opacity', '0.9');
+    this.renderRouteLineGeometry();
+  }
+  removeRouteLine() {
+    this._activeRouteLatLngs = null;
+    if (this._routePolyEl) this._routePolyEl.setAttribute('points', '');
+  }
+
+  select(id) {
+    const p = this.byId(id); if (!p) return;
+    try { document.documentElement.style.setProperty('--sel', p.color); } catch(e){}
+    this.setState({ selected:id }, ()=>{
+      this.updateMarkers();
+      if (this.map) this.flyToPin(p.coords, 8);
+    });
+  }
+  close() { this.setState({ selected:null }, ()=>this.updateMarkers()); }
+  toggleRegion(id) {
+    this.setState(s=>({ hidden: { ...s.hidden, [id]: !s.hidden[id] } }), ()=>this.updateMarkers());
+  }
+  selectRoute(id) {
+    if (this.state.activeRoute === id) { this.clearRoute(); return; }
+    this.setState({ activeRoute:id, selected:null }, ()=>{
+      this.updateMarkers();
+      this.drawRouteLine(id);
+      this.fitRouteBounds(id);
+    });
+  }
+  clearRoute() {
+    this.setState({ activeRoute:null }, ()=>{
+      this.removeRouteLine();
+      this.updateMarkers();
+    });
+  }
+  setPanel(p) {
+    if (p === this.state.panel) return;
+    if (p === 'aree') {
+      this.setState({ panel:p, activeRoute:null }, ()=>{ this.removeRouteLine(); this.updateMarkers(); });
+    } else {
+      this.setState({ panel:p, hidden:{} }, ()=>{ this.updateMarkers(); });
+    }
+  }
+  showAll() {
+    this.setState({ selected:null, activeRoute:null }, ()=>{
+      this.removeRouteLine();
+      this.updateMarkers();
+      if (this.map) this.fitAllBounds(true);
+    });
+  }
+
+  renderVals() {
+    const sel = this.state.selected;
+    const hidden = this.state.hidden;
+    const panel = this.state.panel;
+    const isPercorsi = panel === 'percorsi';
+    const isAree = panel === 'aree';
+    const activeRoute = this.state.activeRoute;
+
+    const regions = this.regions.map(r=>({
+      id:r.id, name:r.name, color:r.color, count:r.places.length,
+      hidden: !!hidden[r.id],
+      eye: hidden[r.id] ? '⌀' : '●',
+      headerOpacity: hidden[r.id] ? '.45' : '1',
+      childDisplay: hidden[r.id] ? 'none' : 'block',
+      toggle: ()=>this.toggleRegion(r.id),
+      places: r.places.map(p=>({
+        id:p.id, name:p.name, cnName:p.cnName, color:p.color,
+        typeLabel:p.type, daysLabel: p.days + (p.days===1?' giorno':' giorni'),
+        onClick: ()=>this.select(p.id),
+      })),
+    }));
+
+    const routes = this.routesRaw.map((r,i)=>{
+      const active = activeRoute === r.id;
+      const fullChain = this.routeChain(r);
+      const totalKm = fullChain.reduce((a,n)=> a + (n.seg && typeof n.seg.km === 'number' ? n.seg.km : 0), 0);
+      return {
+        id:r.id, title:r.title, closeAt:r.closeAt, color:r.color, note:r.note,
+        n:i+1, stopCount:r.stops.length, totalKm: totalKm.toLocaleString('it-IT'),
+        bodyDisplay: active ? 'block' : 'none',
+        chevron: active ? '⌄' : '›',
+        borderColor: active ? r.color : '#E7DFCF',
+        chain: active ? fullChain : [],
+        toggle: ()=>this.selectRoute(r.id),
+      };
+    });
+
+    const places = (sel ? this.flat.filter(p=>p.id===sel) : []).map(p=>({
+      ...p,
+      panelDisplay: 'flex',
+      typeLabel: p.type,
+      daysLabel: p.days + (p.days===1?' giorno':' giorni'),
+      photoA: 'ph-'+p.id+'-a', photoB: 'ph-'+p.id+'-b', photoC: 'ph-'+p.id+'-c', photoD: 'ph-'+p.id+'-d',
+      heroSrc: (window.__resources && window.__resources['photo-'+p.id]) || ('photos/'+p.id+'.jpg'),
+    }));
+
+    return {
+      regions, places, routes,
+      count: this.flat.length,
+      regionCount: this.regions.length,
+      routeCount: this.routesRaw.length,
+      isPercorsi, isAree,
+      percorsiDisplay: isPercorsi ? 'block' : 'none',
+      areeDisplay: isAree ? 'block' : 'none',
+      tabPercorsiBg: isPercorsi ? '#211C18' : '#FFFDF8',
+      tabPercorsiFg: isPercorsi ? '#F7F2E8' : '#5F564B',
+      tabPercorsiBorder: isPercorsi ? '#211C18' : '#D8CEB9',
+      tabAreeBg: isAree ? '#211C18' : '#FFFDF8',
+      tabAreeFg: isAree ? '#F7F2E8' : '#5F564B',
+      tabAreeBorder: isAree ? '#211C18' : '#D8CEB9',
+      tabPercorsi: ()=>this.setPanel('percorsi'),
+      tabAree: ()=>this.setPanel('aree'),
+      drawerTransform: sel ? 'translateX(0)' : 'translateX(calc(100% + 40px))',
+      mapRef: (el)=>{ this.mapEl = el; this.tryInit(); },
+      close: ()=>this.close(),
+      showAll: ()=>this.showAll(),
+    };
+  }
+}
+</script>
+</body>
+</html>
