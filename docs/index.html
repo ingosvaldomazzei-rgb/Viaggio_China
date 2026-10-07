@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mappa del viaggio · Cina</title>
-<meta name="description" content="Mappa interattiva del viaggio in Cina (17 ottobre – 1 novembre 2026): itinerario giorno per giorno, hotel e trasferimenti, più i percorsi alternativi valutati.">
+<meta name="description" content="Mappa interattiva del viaggio in Cina (17 ottobre – 1 novembre 2026): itinerario giorno per giorno, hotel, trasferimenti e foto delle tappe.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=2">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=3">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 <div class="app">
 
   <div id="chinamap" class="map"></div>
 
-  <!-- LEFT: routes / regions -->
+  <!-- LEFT: itinerary -->
   <div class="panel-left">
     <div class="panel-left__header">
       <div class="panel-left__title-row">
@@ -31,22 +31,15 @@
       </div>
       <p class="summary" id="summaryText"></p>
 
-      <div class="tabs">
-        <button class="tab" id="tabItinerario" data-panel="itinerario" type="button">Itinerario</button>
-        <button class="tab" id="tabPercorsi" data-panel="percorsi" type="button">Alternative</button>
-        <button class="tab" id="tabAree" data-panel="aree" type="button">Aree</button>
-      </div>
     </div>
 
     <div class="scrolly panel-left__body">
       <div id="itineraryList"></div>
-      <div id="routesList"></div>
-      <div id="areasList"></div>
     </div>
 
     <div class="panel-left__footer">
       <button class="show-all-btn" id="showAllBtn" type="button">
-        <span class="show-all-icon">◎</span> Inquadra tutta la Cina
+        <span class="show-all-icon">◎</span> Inquadra tutto il viaggio
       </button>
     </div>
   </div>
@@ -62,8 +55,8 @@
 
 </div>
 
-<script src="vendor/leaflet/leaflet.js?v=2"></script>
-<script src="data.js?v=2"></script>
-<script src="app.js?v=2"></script>
+<script src="vendor/leaflet/leaflet.js?v=3"></script>
+<script src="data.js?v=3"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>

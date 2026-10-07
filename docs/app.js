@@ -1,7 +1,7 @@
 // Mappa del viaggio in Cina — standalone implementation (no build step).
-// Ported from the Claude Design prototype (Mappa Cina.dc.html): same data,
-// same interactions, same Leaflet map behavior — reimplemented as plain
-// DOM rendering instead of the proprietary dc-component runtime.
+// Shows the decided itinerary only: day-by-day stays and transfers in the
+// left panel, numbered stops + hotels on a Leaflet map, place details with
+// photos in the right drawer.
 
 (() => {
   'use strict';
@@ -24,7 +24,6 @@
   STAYS.forEach((s, i) => { s.order = i + 1; });
   const stayOf = (placeId) => STAYS.find((s) => s.placeId === placeId);
 
-  function daysLabel(days) { return days + (days === 1 ? ' giorno' : ' giorni'); }
   function nightsLabel(n) { return n === 0 ? 'solo giornata' : n + (n === 1 ? ' notte' : ' notti'); }
   function fmtDate(iso) {
     const [y, m, d] = iso.split('-').map(Number);
@@ -35,22 +34,21 @@
     return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  function routeChain(route) {
-    return route.stops.map((id, i) => {
-      const p = byId(id);
-      const prev = i > 0 ? route.stops[i - 1] : null;
-      const seg = prev ? (SEGMENTS[prev + '>' + id] || { mode: 'Collegamento da definire', km: 0, time: '' }) : null;
-      return { id: p.id, name: p.name, order: i + 1, days: p.days, seg };
-    });
-  }
-
   // ── App state ────────────────────────────────────────────────────────
   const state = {
     selected: null,     // place id shown in the right drawer
-    hidden: {},          // regionId -> bool, area-tab visibility toggle
-    panel: 'itinerario', // 'itinerario' | 'percorsi' | 'aree'
-    activeRoute: null,   // route id highlighted on the map
   };
+
+  // Photo credits (Wikimedia Commons) keyed by place id; see data.js.
+  const photosOf = (placeId) => PHOTOS[placeId] || [];
+  function creditText(ph) { return ph.author + ' · ' + ph.license + ' · Wikimedia Commons'; }
+
+  // An <img> that shows the visitor's own upload for this slot if there is
+  // one (IndexedDB, set from the drawer), else the default photo.
+  function slotImage(img, slotId, fallback) {
+    if (fallback) img.src = fallback;
+    PhotoStore.get(slotId).then((blob) => { if (blob) img.src = URL.createObjectURL(blob); });
+  }
 
   // ── IndexedDB-backed photo store (client-only stand-in for the design
   //    tool's server-side image-slot sidecar — no backend in a static site) ─
@@ -186,32 +184,15 @@
   // ── Rendering ────────────────────────────────────────────────────────
   const els = {
     summary: document.getElementById('summaryText'),
-    tabItinerario: document.getElementById('tabItinerario'),
-    tabPercorsi: document.getElementById('tabPercorsi'),
-    tabAree: document.getElementById('tabAree'),
     itineraryList: document.getElementById('itineraryList'),
-    routesList: document.getElementById('routesList'),
-    areasList: document.getElementById('areasList'),
     drawer: document.getElementById('drawer'),
     drawerBody: document.getElementById('drawerBody'),
   };
 
   function renderSummary() {
     const nights = STAYS.reduce((a, s) => a + s.nights, 0);
-    els.summary.textContent = state.panel === 'itinerario'
-      ? 'Itinerario deciso: ' + nights + ' notti, da Shanghai a Pechino passando per Guangxi e Chongqing. ' +
-        HOTELS.length + ' hotel già scelti.'
-      : FLAT.length + ' luoghi · ' + REGIONS.length + ' aree · ' + ROUTES.length +
-        ' percorsi alternativi valutati in fase di pianificazione.';
-  }
-
-  function renderTabs() {
-    els.tabItinerario.classList.toggle('active', state.panel === 'itinerario');
-    els.tabPercorsi.classList.toggle('active', state.panel === 'percorsi');
-    els.tabAree.classList.toggle('active', state.panel === 'aree');
-    els.itineraryList.style.display = state.panel === 'itinerario' ? 'block' : 'none';
-    els.routesList.style.display = state.panel === 'percorsi' ? 'block' : 'none';
-    els.areasList.style.display = state.panel === 'aree' ? 'block' : 'none';
+    els.summary.textContent = nights + ' notti, da Shanghai a Pechino passando per Guangxi e Chongqing. ' +
+      HOTELS.length + ' hotel già scelti.';
   }
 
   function renderItinerary() {
@@ -254,6 +235,25 @@
       head.addEventListener('click', () => selectPlace(place.id));
       card.appendChild(head);
 
+      const photos = photosOf(place.id);
+      if (photos.length) {
+        const gallery = document.createElement('button');
+        gallery.type = 'button';
+        gallery.className = 'itin-photos' + (photos.length > 1 ? '' : ' itin-photos--single');
+        gallery.setAttribute('aria-label', 'Foto di ' + place.name);
+        photos.slice(0, 4).forEach((ph, i) => {
+          const img = document.createElement('img');
+          img.alt = ph.title;
+          img.title = creditText(ph);
+          img.loading = 'lazy';
+          img.className = i === 0 ? 'itin-photos__main' : 'itin-photos__thumb';
+          slotImage(img, place.id + '-' + 'abcd'[i], ph.src);
+          gallery.appendChild(img);
+        });
+        gallery.addEventListener('click', () => selectPlace(place.id));
+        card.appendChild(gallery);
+      }
+
       const plan = document.createElement('p');
       plan.className = 'itin-stay__plan';
       plan.textContent = step.plan;
@@ -285,115 +285,6 @@
         card.appendChild(t);
       }
       els.itineraryList.appendChild(card);
-    });
-  }
-
-  function renderRoutes() {
-    els.routesList.innerHTML = '';
-    ROUTES.forEach((route, i) => {
-      const active = state.activeRoute === route.id;
-      const chain = active ? routeChain(route) : [];
-      const totalKm = routeChain(route).reduce((a, n) => a + (n.seg ? n.seg.km : 0), 0);
-
-      const card = document.createElement('div');
-      card.className = 'route-card' + (active ? ' active' : '');
-      card.style.setProperty('--route-color', route.color);
-
-      const header = document.createElement('button');
-      header.type = 'button';
-      header.className = 'route-header';
-      header.innerHTML =
-        '<span class="route-num">' + (i + 1) + '</span>' +
-        '<span class="route-heading">' +
-          '<span class="route-title">' + escapeHtml(route.title) + '</span>' +
-          '<span class="route-meta">' +
-            '<span class="route-close">🏁 ' + escapeHtml(route.closeAt) + '</span>' +
-            '<span class="route-stats">· ' + route.stops.length + ' tappe · ~' + totalKm.toLocaleString('it-IT') + ' km</span>' +
-          '</span>' +
-        '</span>' +
-        '<span class="route-chevron">' + (active ? '⌄' : '›') + '</span>';
-      header.addEventListener('click', () => selectRoute(route.id));
-      card.appendChild(header);
-
-      const body = document.createElement('div');
-      body.className = 'route-body';
-      body.hidden = !active;
-      chain.forEach((node) => {
-        const wrap = document.createElement('div');
-        wrap.className = 'chain-node';
-        if (node.seg) {
-          const seg = document.createElement('div');
-          seg.className = 'chain-seg';
-          seg.innerHTML =
-            '<span class="chain-seg-arrow">↓</span>' +
-            '<span class="chain-seg-mode">' + escapeHtml(node.seg.mode) + '</span>' +
-            '<span class="chain-seg-info">· ~' + node.seg.km + ' km · ' + escapeHtml(node.seg.time) + '</span>';
-          wrap.appendChild(seg);
-        }
-        const stopBtn = document.createElement('button');
-        stopBtn.type = 'button';
-        stopBtn.className = 'chain-stop';
-        stopBtn.innerHTML =
-          '<span class="chain-order">' + node.order + '</span>' +
-          '<span class="chain-name">' + escapeHtml(node.name) + '</span>' +
-          '<span class="chain-days">' + daysLabel(node.days) + '</span>';
-        stopBtn.addEventListener('click', () => selectPlace(node.id));
-        wrap.appendChild(stopBtn);
-        body.appendChild(wrap);
-      });
-      if (active) {
-        const note = document.createElement('p');
-        note.className = 'route-note';
-        note.textContent = route.note;
-        body.appendChild(note);
-      }
-      card.appendChild(body);
-      els.routesList.appendChild(card);
-    });
-  }
-
-  function renderAreas() {
-    els.areasList.innerHTML = '';
-    REGIONS.forEach((region) => {
-      const isHidden = !!state.hidden[region.id];
-      const block = document.createElement('div');
-      block.className = 'region-block';
-
-      const header = document.createElement('button');
-      header.type = 'button';
-      header.className = 'region-header' + (isHidden ? ' hidden-region' : '');
-      header.style.setProperty('--region-color', region.color);
-      header.innerHTML =
-        '<span class="region-dot"></span>' +
-        '<span class="region-name">' + escapeHtml(region.name) + '</span>' +
-        '<span class="region-count">' + region.places.length + '</span>' +
-        '<span class="region-eye">' + (isHidden ? '⌀' : '●') + '</span>';
-      header.addEventListener('click', () => toggleRegion(region.id));
-      block.appendChild(header);
-
-      const placesWrap = document.createElement('div');
-      placesWrap.className = 'region-places';
-      placesWrap.hidden = isHidden;
-      region.places.forEach((place) => {
-        const row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'place-row';
-        row.style.setProperty('--place-color', place.color);
-        row.innerHTML =
-          '<span class="place-dot"></span>' +
-          '<span class="place-text">' +
-            '<span class="place-name-row">' +
-              '<span class="place-name">' + escapeHtml(place.name) + '</span>' +
-              '<span class="place-cn">' + escapeHtml(place.cnName) + '</span>' +
-            '</span>' +
-            '<span class="place-sub">' + escapeHtml(place.type) + ' · ' + daysLabel(place.days) + '</span>' +
-          '</span>' +
-          '<span class="place-chevron">›</span>';
-        row.addEventListener('click', () => selectPlace(place.id));
-        placesWrap.appendChild(row);
-      });
-      block.appendChild(placesWrap);
-      els.areasList.appendChild(block);
     });
   }
 
@@ -434,12 +325,15 @@
 
     document.documentElement.style.setProperty('--sel', place.color);
 
-    const slots = [
-      { key: 'a', cls: 'photo-slot--hero', fallback: 'photos/' + place.id + '.jpg' },
-      { key: 'b', cls: 'photo-slot--small', fallback: '' },
-      { key: 'c', cls: 'photo-slot--small', fallback: '' },
-      { key: 'd', cls: 'photo-slot--small', fallback: '' },
-    ];
+    const photos = photosOf(place.id);
+    const slots = ['a', 'b', 'c', 'd'].map((key, i) => ({
+      key, cls: i === 0 ? 'photo-slot--hero' : 'photo-slot--small', fallback: photos[i] ? photos[i].src : '',
+    }));
+    const creditsHtml = photos.length
+      ? '<div class="photo-credits">Foto: ' + photos.map((ph) =>
+          '<a href="' + escapeHtml(ph.page) + '" target="_blank" rel="noopener">' + escapeHtml(ph.author) + '</a> (' + escapeHtml(ph.license) + ')'
+        ).join(' · ') + ' — Wikimedia Commons</div>'
+      : '';
     const slotHtml = (s) =>
       '<div class="photo-slot ' + s.cls + '" data-slot-id="' + place.id + '-' + s.key + '"' +
       (s.fallback ? ' data-fallback="' + escapeHtml(s.fallback) + '"' : '') +
@@ -457,8 +351,7 @@
         '</div>' +
         '<div class="tag-row">' +
           '<span class="tag">' + escapeHtml(place.type) + '</span>' +
-          '<span class="tag"><span class="tag-icon-time">◷</span> ' + daysLabel(place.days) + '</span>' +
-          '<span class="tag"><span class="tag-icon-season">☀</span> ' + escapeHtml(place.bestTime) + '</span>' +
+          (stayOf(place.id) ? '<span class="tag"><span class="tag-icon-time">◷</span> ' + nightsLabel(stayOf(place.id).nights) + '</span>' : '') +
         '</div>' +
         itineraryBoxHtml(place) +
         '<div class="section-label">Foto <span class="hint">· trascina le tue immagini per sostituire</span></div>' +
@@ -466,6 +359,7 @@
           slotHtml(slots[0]) +
           '<div class="photo-grid">' + slotHtml(slots[1]) + slotHtml(slots[2]) + slotHtml(slots[3]) + '</div>' +
         '</div>' +
+        creditsHtml +
         '<p class="place-description">' + escapeHtml(place.description) + '</p>' +
         '<div class="section-label highlights-label">Da non perdere</div>' +
         '<div class="highlights-row">' + place.highlights.map((h) => '<span class="highlight-chip">' + escapeHtml(h) + '</span>').join('') + '</div>' +
@@ -513,49 +407,30 @@
       'px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.45);">' + label + '</div>';
     return L.divIcon({ className: '', html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
   }
-  function fadedIcon(p) {
-    const size = 9;
-    const html = '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + p.color + ';opacity:.35;border:1.5px solid #fff;"></div>';
-    return L.divIcon({ className: '', html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
-  }
   function hotelIcon() {
     const html = '<div class="hotel-pin">🛏</div>';
     return L.divIcon({ className: '', html, iconSize: [26, 26], iconAnchor: [13, 13] });
   }
 
   function icon(p) {
-    const activeRoute = state.activeRoute;
     const selected = state.selected === p.id;
-    if (state.panel === 'itinerario') {
-      const stay = stayOf(p.id);
-      return stay ? badgeIcon(stay.order, TRIP.color, selected) : fadedIcon(p);
-    }
-    if (activeRoute) {
-      const route = ROUTES.find((r) => r.id === activeRoute);
-      const idx = route ? route.stops.indexOf(p.id) : -1;
-      return idx >= 0 ? badgeIcon(idx + 1, route.color, selected) : fadedIcon(p);
-    }
-    const size = selected ? 22 : 15;
+    const stay = stayOf(p.id);
+    if (stay) return badgeIcon(stay.order, TRIP.color, selected);
+    // Transit-only place (Guilin): small pin on the line.
+    const size = selected ? 16 : 11;
     const html = '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + p.color +
-      ';border:' + (selected ? 3 : 2.5) + 'px solid #fff;box-shadow:0 2px 7px rgba(0,0,0,.4);' +
-      (selected ? 'outline:3px solid ' + p.color + '55;' : '') + '"></div>';
+      ';border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4);"></div>';
     return L.divIcon({ className: '', html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
   }
 
   function updateMarkers() {
-    const showAllPins = state.activeRoute || state.panel === 'itinerario';
-    FLAT.forEach((p) => {
-      const m = markers[p.id]; if (!m) return;
-      const hidden = !showAllPins && !!state.hidden[p.regionId];
-      if (hidden) { if (map.hasLayer(m)) map.removeLayer(m); }
-      else { if (!map.hasLayer(m)) m.addTo(map); m.setIcon(icon(p)); }
-    });
-    // Hotel pins only make sense alongside the decided itinerary.
+    FLAT.forEach((p) => { if (markers[p.id]) markers[p.id].setIcon(icon(p)); });
+    // Hotel pins only when zoomed in enough not to cover the numbered stops.
+    const showHotels = map.getZoom() >= HOTEL_MIN_ZOOM;
     HOTELS.forEach((h) => {
       const m = hotelMarkers[h.id]; if (!m) return;
-      const show = state.panel === 'itinerario' && map.getZoom() >= HOTEL_MIN_ZOOM;
-      if (show && !map.hasLayer(m)) m.addTo(map);
-      if (!show && map.hasLayer(m)) map.removeLayer(m);
+      if (showHotels && !map.hasLayer(m)) m.addTo(map);
+      if (!showHotels && map.hasLayer(m)) map.removeLayer(m);
     });
   }
 
@@ -580,8 +455,8 @@
     });
     map.on('zoomend', updateMarkers);
     updateMarkers();
-    if (state.panel === 'itinerario') { drawItineraryLine(); fitLatLngs(itineraryLatLngs(), false); }
-    else fitAllBounds(false);
+    drawItineraryLine();
+    fitLatLngs(itineraryLatLngs(), false);
   }
 
   const PAD = () => ({ paddingTopLeft: L.point(404, 60), paddingBottomRight: L.point(70, 70), duration: .9 });
@@ -590,12 +465,6 @@
     const opts = PAD();
     try { animate ? map.flyToBounds(b, opts) : map.fitBounds(b, opts); }
     catch (e) { try { map.fitBounds(b, opts); } catch (e2) {} }
-  }
-  function fitAllBounds(animate) { fitLatLngs(FLAT.map((p) => p.coords), animate); }
-  function fitRouteBounds(routeId) {
-    const route = ROUTES.find((r) => r.id === routeId);
-    if (!route || !map) return;
-    fitLatLngs(route.stops.map((id) => byId(id).coords), true);
   }
   function itineraryLatLngs() { return TRIP.path.map((id) => byId(id).coords); }
   function flyToPin(coords, zoom) {
@@ -645,15 +514,7 @@
     routePolyEl.setAttribute('opacity', '0.9');
     renderRouteLineGeometry();
   }
-  function drawRouteLine(routeId) {
-    const route = ROUTES.find((r) => r.id === routeId);
-    if (route) drawLine(route.stops.map((id) => byId(id).coords), route.color);
-  }
   function drawItineraryLine() { drawLine(itineraryLatLngs(), TRIP.color); }
-  function removeRouteLine() {
-    activeRouteLatLngs = null;
-    if (routePolyEl) routePolyEl.setAttribute('points', '');
-  }
 
   // ── State transitions ────────────────────────────────────────────────
   function selectPlace(id) {
@@ -665,7 +526,6 @@
   }
   function selectHotel(id) {
     const h = hotelById(id); if (!h) return;
-    if (state.panel !== 'itinerario') setPanel('itinerario');
     state.selected = h.placeId;
     renderDrawer();
     updateMarkers();
@@ -676,63 +536,20 @@
     renderDrawer();
     updateMarkers();
   }
-  function toggleRegion(id) {
-    state.hidden[id] = !state.hidden[id];
-    renderAreas();
-    updateMarkers();
-  }
-  function selectRoute(id) {
-    if (state.activeRoute === id) { clearRoute(); return; }
-    state.activeRoute = id;
-    state.selected = null;
-    renderRoutes();
-    renderDrawer();
-    updateMarkers();
-    drawRouteLine(id);
-    fitRouteBounds(id);
-  }
-  function clearRoute() {
-    state.activeRoute = null;
-    renderRoutes();
-    removeRouteLine();
-    updateMarkers();
-  }
-  function setPanel(p) {
-    if (p === state.panel) return;
-    state.panel = p;
-    state.activeRoute = null;
-    state.hidden = {};
-    removeRouteLine();
-    if (p === 'itinerario') { drawItineraryLine(); if (map) fitLatLngs(itineraryLatLngs(), true); }
-    renderSummary();
-    renderTabs();
-    renderRoutes();
-    renderAreas();
-    updateMarkers();
-  }
   function showAll() {
     state.selected = null;
-    state.activeRoute = null;
     renderDrawer();
-    renderRoutes();
-    if (state.panel === 'itinerario') drawItineraryLine(); else removeRouteLine();
     updateMarkers();
-    if (map) fitAllBounds(true);
+    if (map) fitLatLngs(itineraryLatLngs(), true);
   }
 
   // ── Boot ─────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
     renderSummary();
-    renderTabs();
     renderItinerary();
-    renderRoutes();
-    renderAreas();
     renderDrawer();
     initMap();
 
-    els.tabItinerario.addEventListener('click', () => setPanel('itinerario'));
-    els.tabPercorsi.addEventListener('click', () => setPanel('percorsi'));
-    els.tabAree.addEventListener('click', () => setPanel('aree'));
     document.getElementById('closeBtn').addEventListener('click', closeDrawer);
     document.getElementById('showAllBtn').addEventListener('click', showAll);
   });
