@@ -31,3 +31,7 @@ Clicca o trascina un'immagine su un riquadro per sostituirla con una tua foto: v
 ## Nota sulle immagini reali
 
 Le intestazioni attuali sono placeholder generati, non foto reali dei luoghi — recuperarle da fonti come Wikimedia Commons non è stato possibile in questa sessione perché l'ambiente non aveva accesso di rete a quegli host. Sostituiscile trascinando le tue foto, oppure chiedi di riprovare il recupero automatico da un ambiente con accesso di rete più ampio.
+
+## Cache del browser
+
+In `index.html` i file CSS e JS sono richiamati con un numero di versione (`?v=2`). Ad ogni modifica di `app.js`, `data.js` o `styles.css` va aumentato (`?v=3`, …), così i browser scaricano subito la versione nuova invece di quella in cache.
