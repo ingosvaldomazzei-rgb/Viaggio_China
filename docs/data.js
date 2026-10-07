@@ -126,5 +126,46 @@ const TRIP = {
   ],
 };
 
-// Foto delle tappe (Wikimedia Commons): src, autore, licenza, pagina.
-const PHOTOS = {};
+// Foto delle tappe da Wikimedia Commons (licenze libere): autore e licenza
+// vanno sempre mostrati, la scheda di dettaglio li elenca sotto le foto.
+const PHOTOS = {
+  suzhou: [
+    {"src": "photos/suzhou-1.jpg", "title": "Giardino dell'Amministratore Umile", "author": "King of Hearts", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Humble_Administrator%27s_Garden_Suzhou_November_2017_005.jpg"},
+    {"src": "photos/suzhou-2.jpg", "title": "Canale di Pingjiang Road", "author": "song songroov", "license": "CC BY 3.0", "page": "https://commons.wikimedia.org/wiki/File:Riverside_of_Pingjiang_Road,_Gusu,_Suzhou,_Jiangsu,_China,_215000.jpg"},
+    {"src": "photos/suzhou-3.jpg", "title": "Giardino del Riposo (Liuyuan)", "author": "Another Believer", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Lingering_Garden,_Suzhou,_China_(2015)_-_07.jpg"},
+    {"src": "photos/suzhou-4.jpg", "title": "Finestra tonda nel Giardino del Riposo", "author": "Another Believer", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Lingering_Garden,_Suzhou,_China_(2015)_-_27.jpg"},
+  ],
+  tongli: [
+    {"src": "photos/tongli-1.jpg", "title": "Canali e ponti di Tongli", "author": "EditQ", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:The_Three_Bridges_of_Tongli_1.jpg"},
+    {"src": "photos/tongli-2.jpg", "title": "Giardino Tuisi", "author": "Zossolino", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:2015-09-25-080503_-_Tongli,_Tuisi_Yuan_-_%E2%80%9EGarten_des_Pension%C3%A4rs%E2%80%9C.jpg"},
+    {"src": "photos/tongli-3.jpg", "title": "Pescatore con i cormorani", "author": "Rose Abrams", "license": "CC BY 4.0", "page": "https://commons.wikimedia.org/wiki/File:Waters_of_Tongli_05.jpg"},
+    {"src": "photos/tongli-4.jpg", "title": "Sotto un ponte in pietra", "author": "Ben Burkland/Carolyn Cook", "license": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:Tongli_pic_3.jpg"},
+  ],
+  shanghai: [
+    {"src": "photos/shanghai-1.jpg", "title": "Skyline di Pudong di sera", "author": "Larry Qian", "license": "CC0", "page": "https://commons.wikimedia.org/wiki/File:Shanghai_Lujiazui_night_skyline_2017_-_Flickr.jpg"},
+    {"src": "photos/shanghai-2.jpg", "title": "Il Bund dal fiume Huangpu", "author": "Ermell", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Shanghai_Bund-20150516-RM-173803.jpg"},
+    {"src": "photos/shanghai-3.jpg", "title": "Giardino Yu", "author": "Stefan Fussan", "license": "CC BY-SA 3.0", "page": "https://commons.wikimedia.org/wiki/File:Shanghai_-_Yu_Garden_-_0034.jpg"},
+    {"src": "photos/shanghai-4.jpg", "title": "Wukang Mansion, Concessione Francese", "author": "N509FZ", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Wukang_Mansion_(20191114161507).jpg"},
+  ],
+  yangshuo: [
+    {"src": "photos/yangshuo-1.jpg", "title": "Il fiume Li tra le colline carsiche", "author": "chensiyuan", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:1_li_jiang_guilin_yangshuo_2011.jpg"},
+    {"src": "photos/yangshuo-2.jpg", "title": "Zattere sul fiume", "author": "Huangdan2060", "license": "CC0", "page": "https://commons.wikimedia.org/wiki/File:Li_River_and_mountains_in_Yangshuo_County,_Guilin52.jpg"},
+    {"src": "photos/yangshuo-3.jpg", "title": "Collina della Luna (Moon Hill)", "author": "Maria Ly", "license": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:Moon_Hill_-_Yangshuo,_China.jpg"},
+    {"src": "photos/yangshuo-4.jpg", "title": "Paesaggio carsico al tramonto", "author": "chensiyuan", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:1_yangshuo_moon_hill_view_2011.jpg"},
+  ],
+  chongqing: [
+    {"src": "photos/chongqing-1.jpg", "title": "Hongyadong di sera", "author": "GeoffLeng", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:%E9%87%8D%E5%BA%86%E6%B4%AA%E5%B4%96%E6%B4%9E.jpg"},
+    {"src": "photos/chongqing-2.jpg", "title": "Chongqing dall’alto di notte", "author": "HoweyYuan", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Chaotianmen_nightview_20240721.jpg"},
+    {"src": "photos/chongqing-3.jpg", "title": "Hongyadong di giorno", "author": "xiquinhosilva", "license": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:Hongya_Cave_20180520.jpg"},
+    {"src": "photos/chongqing-4.jpg", "title": "Skyline sul fiume", "author": "Baycrest", "license": "CC BY-SA 2.5", "page": "https://commons.wikimedia.org/wiki/File:Chongqing_Jiefangbei_CBD.jpg"},
+  ],
+  beijing: [
+    {"src": "photos/beijing-1.jpg", "title": "Grande Muraglia a Mutianyu", "author": "Velatrix", "license": "CC0", "page": "https://commons.wikimedia.org/wiki/File:Great_Wall_of_China_July_2006.JPG"},
+    {"src": "photos/beijing-2.jpg", "title": "Città Proibita", "author": "Ermell", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Beijing_forbidden_city_Belvedere_of_Embodying_Benevolence-20071018-RM-142403.jpg"},
+    {"src": "photos/beijing-3.jpg", "title": "Tempio del Cielo", "author": "Fong Chen", "license": "Public domain", "page": "https://commons.wikimedia.org/wiki/File:Hall_of_Prayer_for_Good_Harvest.JPG"},
+    {"src": "photos/beijing-4.jpg", "title": "Palazzo d’Estate", "author": "Ermell", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Peking_Sommerpalast_Longivity_Hill-20071020-RM-091840.jpg"},
+  ],
+  guilin: [
+    {"src": "photos/guilin-1.jpg", "title": "Collina della Proboscide di Elefante di sera", "author": "N509FZ", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Guilin_Elephant_Hill_at_night_(20240217201207).jpg"},
+  ],
+};
