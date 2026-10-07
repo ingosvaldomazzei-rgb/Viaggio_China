@@ -158,6 +158,7 @@ body { font-family: 'Manrope', system-ui, sans-serif; background: #E9E2D3; }
 .photo-slot--hero { height: 150px; border-radius: 14px; }
 .photo-slot--small { height: 82px; border-radius: 12px; }
 .photo-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-slot img[hidden] { display: none; }
 .photo-slot .placeholder-label { font-size: 12px; font-weight: 600; color: #A99E8A; font-family: 'Manrope', sans-serif; text-align: center; padding: 0 10px; pointer-events: none; }
 .photo-slot.has-image .placeholder-label { display: none; }
 .photo-slot .photo-clear { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(33,28,24,.55); color: #fff; border: none; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; display: none; }
@@ -180,3 +181,44 @@ body { font-family: 'Manrope', system-ui, sans-serif; background: #E9E2D3; }
   .drawer { left: 10px; right: 10px; top: auto; bottom: 10px; width: auto; height: 56vh; transform: translateY(calc(100% + 40px)); }
   .drawer.open { transform: translateY(0); }
 }
+
+/* ── Itinerario definitivo ──────────────────────────────────────────── */
+.itin-stay { background: #FFFDF8; border: 1.5px solid #E7DFCF; border-left: 4px solid var(--place-color); border-radius: 14px; padding: 4px 12px 12px; }
+.itin-stay__head { width: 100%; text-align: left; border: none; background: transparent; cursor: pointer; padding: 8px 0 4px; display: flex; align-items: center; gap: 10px; }
+.itin-stay__head .chain-order { width: 24px; height: 24px; font-size: 11.5px; }
+.itin-stay__heading { flex: 1; min-width: 0; }
+.itin-stay__name { display: block; font-family: 'Spectral', serif; font-weight: 600; font-size: 16px; color: #211C18; line-height: 1.2; }
+.itin-stay__dates { display: block; font-size: 11.5px; font-weight: 700; color: var(--place-color); margin-top: 2px; }
+.itin-stay__plan { font-size: 12.5px; line-height: 1.5; color: #4A423A; margin: 4px 0 0; }
+.itin-hotel { width: 100%; text-align: left; margin-top: 8px; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 10px; border: 1px solid #EDE5D3; background: #FBF8F1; font-family: 'Manrope', sans-serif; cursor: pointer; }
+.itin-hotel:hover { background: #F3ECDC; }
+.itin-hotel__icon { flex: none; font-size: 13px; }
+.itin-hotel__name { font-size: 12px; font-weight: 700; color: #3A342E; line-height: 1.3; }
+.itin-hotel--missing { cursor: default; border-style: dashed; border-color: #D9A441; background: #FBF3E2; }
+.itin-hotel--missing:hover { background: #FBF3E2; }
+.itin-hotel--missing .itin-hotel__name { color: #8A6A2E; }
+.itin-note { margin-top: 8px; font-size: 11.5px; line-height: 1.45; color: #6E655A; }
+.itin-note--todo { color: #8A6A2E; background: #FBF3E2; border-radius: 8px; padding: 6px 9px; }
+
+.itin-move { margin: 6px 0 6px 14px; padding: 4px 0 4px 14px; border-left: 2px dashed var(--route-color); }
+.itin-move.todo { border-left-color: #D9A441; }
+.itin-move__head { display: flex; align-items: baseline; gap: 6px; }
+.itin-move__icon { color: var(--route-color); font-size: 12px; }
+.itin-move__title { font-size: 12px; font-weight: 700; color: #3A342E; line-height: 1.35; }
+.itin-move__meta, .itin-move__time { font-size: 11px; color: #6E655A; margin-top: 2px; }
+.itin-move__detail { font-size: 11px; line-height: 1.45; color: #8A8071; margin-top: 3px; }
+.itin-date { font-weight: 700; color: #5F564B; }
+.itin-badge { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 700; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; }
+.itin-badge--todo { background: #FBF3E2; color: #8A6A2E; border: 1px solid #E4D2B0; }
+
+.itin-box { margin-top: 18px; background: #FFFDF8; border: 1px solid #E7DFCF; border-left: 4px solid var(--place-color); border-radius: 14px; padding: 14px 16px; }
+.itin-box__dates { margin: 8px 0 0; font-size: 14px; font-weight: 700; color: #211C18; }
+.itin-box__hotel { margin-top: 12px; padding-top: 12px; border-top: 1px solid #EDE5D3; }
+.itin-box__hotel-name { font-family: 'Spectral', serif; font-weight: 600; font-size: 15.5px; color: #211C18; line-height: 1.3; }
+.itin-box__hotel-line { font-size: 12.5px; line-height: 1.5; color: #4A423A; margin-top: 4px; }
+.itin-box__muted { color: #8A8071; font-size: 11.5px; }
+.itin-box__actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.itin-box__btn { display: inline-flex; align-items: center; padding: 7px 12px; border-radius: 10px; border: 1px solid #D8CEB9; background: #FBF8F1; font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 700; color: #3A342E; cursor: pointer; text-decoration: none; }
+.itin-box__btn:hover { background: #F3ECDC; }
+
+.hotel-pin { width: 26px; height: 26px; border-radius: 8px; background: #211C18; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; font-size: 13px; line-height: 1; }
