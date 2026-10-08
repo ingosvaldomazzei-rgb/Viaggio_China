@@ -1,41 +1,35 @@
-// Data model for the China trip map: the places of the decided itinerary
-// (grouped by area), the chosen hotels and the day-by-day trip (TRIP).
+// Contenuti dell'app del viaggio in Cina. Tutto ciò che si vede nelle pagine
+// viene da qui: città (REGIONS), hotel (HOTELS), spostamenti (TRIP), foto
+// (PHOTOS), punti da vedere (POINTS), giorni (DAYS) e info utili (INFO).
 
 const REGIONS = [
   { id: 'est', name: 'Est · Shanghai e dintorni', color: '#3E5C9A', places: [
     { id: 'shanghai', name: 'Shanghai', cnName: '上海', coords: [31.2304, 121.4737], type: 'Città',
       description: "La metropoli più scintillante della Cina: sul Bund gli edifici coloniali guardano lo skyline futuristico di Pudong al di là del fiume. Tra il classico Giardino Yu, i caffè della Concessione Francese e i grattacieli panoramici, è un ottimo punto di partenza o di rientro.",
-      highlights: ['Il Bund', 'Skyline di Pudong', 'Giardino Yu', 'Concessione Francese'],
       howToGet: "Si arriva all'aeroporto di Pudong (PVG) il 17; ci si torna il 18 da Tongli/Suzhou e il 22 si parte in volo da Hongqiao (SHA) per Guilin." },
     { id: 'suzhou', name: 'Suzhou', cnName: '苏州', coords: [31.2989, 120.5853], type: 'Città',
       description: "La Venezia d'Oriente, celebre per i giardini classici patrimonio UNESCO: microcosmi di rocce, acqua e padiglioni concepiti come dipinti tridimensionali. Canali, ponti in pietra e l'antica tradizione della seta completano il fascino della città vecchia.",
-      highlights: ['Giardini classici', 'Canali', 'Seta', 'Città vecchia'],
       howToGet: "Il 17 dall'aeroporto PVG: Airport Link Line fino a Hongqiao, poi treno AV (~1h 30m in tutto)." },
     { id: 'tongli', name: 'Tongli', cnName: '同里', coords: [31.1560, 120.7250], type: 'Borgo d’acqua',
       description: "Uno dei borghi d'acqua più armoniosi vicino a Suzhou: una rete di canali attraversati da ponti in pietra, case affacciate sull'acqua e il raffinato giardino Tuisi. Perfetto per una mezza giornata in barca a remi, lontano dalla folla.",
-      highlights: ['Canali e ponti', 'Giardino Tuisi', 'Barche a remi'],
       howToGet: "Da Suzhou ~50 min in taxi/Didi (28 km), oppure metro linea 4 + bus (~1h 40m)." },
   ]},
   { id: 'guangxi', name: 'Sud · Guangxi', color: '#5E8C3A', places: [
     { id: 'guilin', name: 'Guilin', cnName: '桂林', coords: [25.2736, 110.2907], type: 'Città',
       description: "Città-base immersa nel paesaggio carsico più celebre del paese, tra colline a pan di zucchero e il fiume Li. Offre grotte spettacolari, laghi urbani con pagode illuminate e ottime connessioni verso Yangshuo e i villaggi dei dintorni.",
-      highlights: ['Fiume Li', 'Collina della Proboscide', 'Grotte del Flauto di Canna'],
       howToGet: "Solo transito: il 22 si atterra all'aeroporto di Guilin e si prosegue subito per Yangshuo (~1h 15m–1h 30m)." },
     { id: 'yangshuo', name: 'Yangshuo', cnName: '阳朔', coords: [24.7791, 110.4966], type: 'Natura',
       description: "Il regno dei pinnacoli carsici lungo il fiume Li: la crociera da Guilin regala gli scenari da dipinto che si ritrovano persino sulle banconote. Attorno, campi e terrazze di tè, villaggi rurali da girare in bici e lo spettacolo serale dei pescatori con i cormorani.",
-      highlights: ['Fiume Li', 'Colline carsiche', 'Terrazze di tè', 'Cormorani'],
       howToGet: "Arrivo il 22 dall'aeroporto di Guilin in navetta o taxi (~85 km); il 25 si riparte in treno AV per Chongqing." },
   ]},
   { id: 'chongqing', name: 'Sud-ovest · Chongqing', color: '#2E7D64', places: [
     { id: 'chongqing', name: 'Chongqing', cnName: '重庆', coords: [29.5630, 106.5516], type: 'Città',
       description: "Megalopoli verticale abbarbicata sulle colline alla confluenza di due fiumi: grattacieli su più livelli, la monorotaia che attraversa i palazzi, hot pot bollente e il vecchio quartiere di Ciqikou. È anche il porto d'imbarco per le crociere lungo lo Yangtze e le Tre Gole.",
-      highlights: ['Hot pot', 'Hongyadong', 'Ciqikou', 'Crociere sullo Yangtze'],
       howToGet: "Arrivo il 25 in treno ad alta velocità da Guilin/Yangshuo; partenza il 27 sera in volo per Pechino." },
   ]},
   { id: 'nord', name: 'Nord · Pechino', color: '#C0392B', places: [
     { id: 'beijing', name: 'Pechino', cnName: '北京', coords: [39.9042, 116.4074], type: 'Città',
       description: "Cuore politico e millenario della Cina. Si passa dalla sterminata Piazza Tienanmen ai cortili della Città Proibita, dai vicoli (hutong) in risciò ai tratti più panoramici della Grande Muraglia come Mutianyu o Jinshanling. Da mettere in conto almeno un'intera giornata per la Muraglia.",
-      highlights: ['Città Proibita', 'Grande Muraglia (Mutianyu)', 'Tempio del Cielo', 'Hutong'],
       howToGet: "Arrivo il 27 sera in volo da Chongqing all'aeroporto Capital (PEK); il 1° novembre volo di rientro per Malpensa dall'aeroporto Daxing (PKX). L'hotel è sulla metro linea 10, che porta a entrambi i collegamenti aeroportuali." },
   ]},
 ];
@@ -168,5 +162,90 @@ const PHOTOS = {
   ],
   guilin: [
     {"src": "photos/guilin-1.jpg", "title": "Collina della Proboscide di Elefante di sera", "author": "N509FZ", "license": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Guilin_Elephant_Hill_at_night_(20240217201207).jpg"},
+  ],
+};
+
+// ── Punti da vedere ─────────────────────────────────────────────────────
+// Ognuno ha una sua pagina. Campi: id, placeId, name; facoltativi: cnName
+// (nome cinese, utile per taxi e mappe cinesi), coords [lat, lng], summary,
+// photo (indice in PHOTOS[placeId]), hours (orari), tickets (biglietti e
+// prenotazione), tips (elenco di consigli). Per ora c'è solo il nome.
+const POINTS = [
+  { id: "suzhou-giardini-classici", placeId: "suzhou", name: "Giardini classici", photo: 0 },
+  { id: "suzhou-canali", placeId: "suzhou", name: "Canali", photo: 1 },
+  { id: "suzhou-seta", placeId: "suzhou", name: "Seta" },
+  { id: "suzhou-citta-vecchia", placeId: "suzhou", name: "Città vecchia" },
+  { id: "tongli-canali-e-ponti", placeId: "tongli", name: "Canali e ponti", photo: 0 },
+  { id: "tongli-giardino-tuisi", placeId: "tongli", name: "Giardino Tuisi", photo: 1 },
+  { id: "tongli-barche-a-remi", placeId: "tongli", name: "Barche a remi" },
+  { id: "shanghai-il-bund", placeId: "shanghai", name: "Il Bund", photo: 1 },
+  { id: "shanghai-skyline-di-pudong", placeId: "shanghai", name: "Skyline di Pudong", photo: 0 },
+  { id: "shanghai-giardino-yu", placeId: "shanghai", name: "Giardino Yu", photo: 2 },
+  { id: "shanghai-concessione-francese", placeId: "shanghai", name: "Concessione Francese", photo: 3 },
+  { id: "yangshuo-fiume-li", placeId: "yangshuo", name: "Fiume Li", photo: 0 },
+  { id: "yangshuo-colline-carsiche", placeId: "yangshuo", name: "Colline carsiche", photo: 3 },
+  { id: "yangshuo-terrazze-di-te", placeId: "yangshuo", name: "Terrazze di tè" },
+  { id: "yangshuo-cormorani", placeId: "yangshuo", name: "Cormorani" },
+  { id: "chongqing-hot-pot", placeId: "chongqing", name: "Hot pot" },
+  { id: "chongqing-hongyadong", placeId: "chongqing", name: "Hongyadong", photo: 0 },
+  { id: "chongqing-ciqikou", placeId: "chongqing", name: "Ciqikou" },
+  { id: "chongqing-crociere-sullo-yangtze", placeId: "chongqing", name: "Crociere sullo Yangtze" },
+  { id: "beijing-citta-proibita", placeId: "beijing", name: "Città Proibita", photo: 1 },
+  { id: "beijing-grande-muraglia-mutianyu", placeId: "beijing", name: "Grande Muraglia (Mutianyu)", photo: 0 },
+  { id: "beijing-tempio-del-cielo", placeId: "beijing", name: "Tempio del Cielo", photo: 2 },
+  { id: "beijing-hutong", placeId: "beijing", name: "Hutong" },
+];
+
+// ── Giorni ──────────────────────────────────────────────────────────────
+// Ogni data del viaggio appartiene a una città (placeId) e ha una sua pagina.
+// points: id dei POINTS in programma quel giorno, in ordine di visita.
+const DAYS = [
+  { date: '2026-10-17', placeId: 'suzhou', title: "Arrivo in Cina e giornata a Suzhou", plan: "Atterraggio a Pudong alle 05:50, treno per Suzhou, giornata in città. In serata trasferimento a Tongli, notte nella città antica.", points: [] },
+  { date: '2026-10-18', placeId: 'tongli', title: "Tongli e Suzhou, sera a Shanghai", plan: "Mattina tra Tongli e Suzhou, poi trasferimento a Shanghai per la serata.", points: [] },
+  { date: '2026-10-19', placeId: 'shanghai', title: "Shanghai", plan: "", points: [] },
+  { date: '2026-10-20', placeId: 'shanghai', title: "Shanghai", plan: "", points: [] },
+  { date: '2026-10-21', placeId: 'shanghai', title: "Shanghai", plan: "", points: [] },
+  { date: '2026-10-22', placeId: 'yangshuo', title: "Volo per Guilin e arrivo a Yangshuo", plan: "Volo molto presto da Hongqiao (SHA), poi trasferimento dall'aeroporto di Guilin a Yangshuo.", points: [] },
+  { date: '2026-10-23', placeId: 'yangshuo', title: "Yangshuo", plan: "", points: [] },
+  { date: '2026-10-24', placeId: 'yangshuo', title: "Yangshuo", plan: "", points: [] },
+  { date: '2026-10-25', placeId: 'chongqing', title: "Treno per Chongqing", plan: "In mattinata treno ad alta velocità da Guilin/Yangshuo a Chongqing.", points: [] },
+  { date: '2026-10-26', placeId: 'chongqing', title: "Chongqing", plan: "Giornata piena in città.", points: [] },
+  { date: '2026-10-27', placeId: 'chongqing', title: "Chongqing, la sera volo per Pechino", plan: "Giornata a Chongqing fino a sera, poi volo CKG → PEK. Arrivo e riposo.", points: [] },
+  { date: '2026-10-28', placeId: 'beijing', title: "Pechino", plan: "", points: [] },
+  { date: '2026-10-29', placeId: 'beijing', title: "Pechino", plan: "", points: [] },
+  { date: '2026-10-30', placeId: 'beijing', title: "Pechino", plan: "", points: [] },
+  { date: '2026-10-31', placeId: 'beijing', title: "Pechino", plan: "", points: [] },
+  { date: '2026-11-01', placeId: 'beijing', title: "Rientro in Italia", plan: "Verso ora di pranzo volo Pechino Daxing (PKX) → Milano Malpensa.", points: [] },
+];
+
+// ── Info utili ──────────────────────────────────────────────────────────
+// Numeri di Ambasciata e Consolati verificati sui siti ufficiali (ottobre
+// 2026); 110/120/119 sono i numeri nazionali cinesi di emergenza.
+const INFO = {
+  emergency: [
+    { label: 'Polizia', number: '110' },
+    { label: 'Ambulanza', number: '120' },
+    { label: 'Vigili del fuoco', number: '119' },
+  ],
+  consular: [
+    { label: 'Ambasciata d’Italia a Pechino', phone: '+86 10 8532 7600', emergency: '+86 139 0103 2957',
+      note: 'Numero di emergenza solo per emergenze reali, quando l’Ambasciata è chiusa. Copre anche il Guangxi (Guilin, Yangshuo).',
+      link: 'https://ambpechino.esteri.it/en/chi-siamo/numeri-di-emergenza/' },
+    { label: 'Consolato Generale a Shanghai', phone: '+86 21 6596 5900', emergency: '+86 139 0199 3054',
+      note: 'Competente per Shanghai e Jiangsu (Suzhou, Tongli). Changle Lu 989, The Center, 19° piano.',
+      link: 'https://consshanghai.esteri.it/en/?p=127' },
+    { label: 'Consolato Generale a Chongqing', phone: '+86 23 6382 2511',
+      note: 'Chongqing World Financial Center, 49° piano, 188 Minzu Road. Fuori orario: numero di emergenza dell’Ambasciata.',
+      link: 'https://conschongqing.esteri.it/en/chi-siamo/la-sede/' },
+    { label: 'Unità di Crisi della Farnesina', emergency: '+39 06 36225',
+      note: 'Gravi emergenze all’estero. Prima di partire registrate il viaggio su Dove Siamo nel Mondo (app Viaggiare Sicuri).',
+      link: 'https://www.viaggiaresicuri.it' },
+  ],
+  apps: [
+    { name: 'Alipay / WeChat Pay', why: 'In Cina si paga quasi tutto con il telefono: collegate la carta prima di partire.' },
+    { name: 'Amap (Gaode)', why: 'Mappe e navigazione affidabili in Cina, dove Google Maps funziona male.' },
+    { name: 'Didi', why: 'Taxi e auto con conducente, utilizzabile anche in inglese.' },
+    { name: 'Trip.com', why: 'Treni, voli e hotel in un’unica app.' },
+    { name: 'VPN o eSIM con roaming', why: 'Google, WhatsApp e molti siti occidentali in Cina sono bloccati.' },
   ],
 };

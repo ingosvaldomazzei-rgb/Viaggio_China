@@ -2,61 +2,47 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mappa del viaggio · Cina</title>
-<meta name="description" content="Mappa interattiva del viaggio in Cina (17 ottobre – 1 novembre 2026): itinerario giorno per giorno, hotel, trasferimenti e foto delle tappe.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=4">
-<link rel="stylesheet" href="styles.css?v=4">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viaggio in Cina</title>
+<meta name="description" content="App del viaggio in Cina (17 ottobre – 1 novembre 2026): itinerario giorno per giorno, città, punti da vedere, hotel, spostamenti e info utili. Funziona anche offline.">
+<meta name="theme-color" content="#B23A2E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Cina 2026">
+<link rel="stylesheet" href="fonts/fonts.css?v=5">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=5">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
-<div class="app">
 
-  <div id="chinamap" class="map"></div>
-
-  <!-- LEFT: itinerary -->
-  <div class="panel-left">
-    <div class="panel-left__header">
-      <div class="panel-left__title-row">
-        <div>
-          <div class="eyebrow">Mappa del viaggio</div>
-          <div class="title-row">
-            <h1 class="title-cn">Cina</h1>
-            <span class="title-cn-sub">中国</span>
-          </div>
-        </div>
-        <span class="season-chip">🍂 17 ott – 1 nov</span>
-      </div>
-      <p class="summary" id="summaryText"></p>
-
-    </div>
-
-    <div class="scrolly panel-left__body">
-      <div id="itineraryList"></div>
-    </div>
-
-    <div class="panel-left__footer">
-      <button class="show-all-btn" id="showAllBtn" type="button">
-        <span class="show-all-icon">◎</span> Inquadra tutto il viaggio
-      </button>
-    </div>
+<header class="topbar">
+  <button class="topbar__back" id="backBtn" type="button" aria-label="Indietro" hidden>‹</button>
+  <div class="topbar__titles">
+    <div class="topbar__eyebrow" id="topEyebrow">Viaggio in Cina</div>
+    <h1 class="topbar__title" id="topTitle">Oggi</h1>
   </div>
+</header>
 
-  <!-- RIGHT: detail drawer -->
-  <div class="drawer" id="drawer">
-    <div class="drawer__accent"></div>
-    <div class="drawer__close-row">
-      <button class="close-btn" id="closeBtn" type="button" aria-label="Chiudi">✕</button>
-    </div>
-    <div class="scrolly drawer__body" id="drawerBody"></div>
-  </div>
+<main class="view" id="view"></main>
 
+<nav class="tabbar" aria-label="Sezioni">
+  <a class="tabbar__item" href="#/" data-tab="oggi"><span class="tabbar__icon">☀</span><span>Oggi</span></a>
+  <a class="tabbar__item" href="#/itinerario" data-tab="itinerario"><span class="tabbar__icon">☰</span><span>Itinerario</span></a>
+  <a class="tabbar__item" href="#/mappa" data-tab="mappa"><span class="tabbar__icon">◎</span><span>Mappa</span></a>
+  <a class="tabbar__item" href="#/info" data-tab="info"><span class="tabbar__icon">ⓘ</span><span>Info</span></a>
+</nav>
+
+<div class="driver" id="driverCard" hidden>
+  <button class="driver__close" id="driverClose" type="button" aria-label="Chiudi">✕</button>
+  <div class="driver__body" id="driverBody"></div>
 </div>
 
-<script src="vendor/leaflet/leaflet.js?v=4"></script>
-<script src="data.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="vendor/leaflet/leaflet.js?v=5"></script>
+<script src="data.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
