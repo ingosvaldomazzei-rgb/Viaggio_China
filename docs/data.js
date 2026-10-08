@@ -36,7 +36,7 @@ const REGIONS = [
     { id: 'beijing', name: 'Pechino', cnName: '北京', coords: [39.9042, 116.4074], type: 'Città',
       description: "Cuore politico e millenario della Cina. Si passa dalla sterminata Piazza Tienanmen ai cortili della Città Proibita, dai vicoli (hutong) in risciò ai tratti più panoramici della Grande Muraglia come Mutianyu o Jinshanling. Da mettere in conto almeno un'intera giornata per la Muraglia.",
       highlights: ['Città Proibita', 'Grande Muraglia (Mutianyu)', 'Tempio del Cielo', 'Hutong'],
-      howToGet: "Arrivo il 27 sera in volo da Chongqing; il 1° novembre volo di rientro in Italia." },
+      howToGet: "Arrivo il 27 sera in volo da Chongqing all'aeroporto Capital (PEK); il 1° novembre volo di rientro per Malpensa dall'aeroporto Daxing (PKX). L'hotel è sulla metro linea 10, che porta a entrambi i collegamenti aeroportuali." },
   ]},
 ];
 
@@ -99,7 +99,8 @@ const TRIP = {
       mode: 'Treno AV da Suzhou, oppure auto da Tongli', time: '~25–40 min in treno AV · ~1h 30m in auto' },
     { type: 'stay', placeId: 'shanghai', from: '2026-10-18', to: '2026-10-22', nights: 4,
       plan: 'Sera del 18, poi 19, 20 e 21 pieni a Shanghai.',
-      todo: 'Hotel da definire. Il 22 il volo parte molto presto da Hongqiao (SHA): conviene tenerne conto nella scelta della zona.' },
+      hotelNote: '3 hotel prenotati, da scegliere quale tenere',
+      todo: 'Il 22 il volo parte molto presto da Hongqiao (SHA): nella scelta tra i 3 hotel conviene tenere conto della distanza dall’aeroporto.' },
     { type: 'move', date: '2026-10-22', status: 'ok',
       title: 'Volo Shanghai Hongqiao (SHA) → Guilin (KWL), poi Yangshuo',
       mode: 'Volo + navetta/taxi', time: '~2h 30m di volo · ~1h 15m–1h 30m di strada (85 km)',
@@ -114,15 +115,15 @@ const TRIP = {
     { type: 'stay', placeId: 'chongqing', from: '2026-10-25', to: '2026-10-27', nights: 2, hotelId: 'h-chongqing',
       plan: 'Il 26 giornata piena; il 27 fino a sera.' },
     { type: 'move', date: '2026-10-27', status: 'ok',
-      title: 'Chongqing → Pechino (sera)',
+      title: 'Volo Chongqing (CKG) → Pechino Capital (PEK) (sera)',
       mode: 'Volo', time: '~2h 30m–3h di volo',
-      detail: 'Aeroporto di arrivo a Pechino (Capital PEK o Daxing PKX) da confermare.' },
+      detail: 'Da PEK all’hotel: Airport Express fino a Sanyuanqiao (~20–30 min), poi metro linea 10 fino a Jinsong; oppure taxi. L’Airport Express chiude verso le 22:50: se atterrate tardi, taxi.' },
     { type: 'stay', placeId: 'beijing', from: '2026-10-27', to: '2026-11-01', nights: 5, hotelId: 'h-beijing',
       plan: 'Il 27 arrivo e riposo; 28, 29, 30 e 31 pieni a Pechino e dintorni.' },
     { type: 'move', date: '2026-11-01', status: 'ok',
-      title: 'Volo di rientro in Italia',
+      title: 'Volo Pechino Daxing (PKX) → Milano Malpensa (MXP)',
       mode: 'Volo', time: 'Verso ora di pranzo',
-      detail: 'Aeroporto da confermare: Capital (PEK) o Daxing (PKX).' },
+      detail: 'Dall’hotel: metro linea 10 da Jinsong a Caoqiao, poi Daxing Airport Express (~19 min); in tutto ~1h–1h 15m, oppure taxi. Volo internazionale: in aeroporto circa 3 ore prima.' },
   ],
 };
 

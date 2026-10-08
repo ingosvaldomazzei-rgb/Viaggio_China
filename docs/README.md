@@ -29,7 +29,7 @@ Lo sfondo usa le tile standard di OpenStreetMap (nomi delle località in caratte
 
 ## Cache del browser
 
-In `index.html` i file CSS e JS sono richiamati con un numero di versione (`?v=3`). Ad ogni modifica di `app.js`, `data.js` o `styles.css` va aumentato, così i browser scaricano subito la versione nuova.
+In `index.html` i file CSS e JS sono richiamati con un numero di versione (`?v=4`). Ad ogni modifica di `app.js`, `data.js` o `styles.css` va aumentato, così i browser scaricano subito la versione nuova.
 
 ## Pubblicare e provare in locale
 

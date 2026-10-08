@@ -269,7 +269,7 @@
       } else if (step.nights > 0) {
         const h = document.createElement('div');
         h.className = 'itin-hotel itin-hotel--missing';
-        h.innerHTML = '<span class="itin-hotel__icon">🛏</span><span class="itin-hotel__name">Hotel da definire</span>';
+        h.innerHTML = '<span class="itin-hotel__icon">🛏</span><span class="itin-hotel__name">' + escapeHtml(step.hotelNote || 'Hotel da definire') + '</span>';
         card.appendChild(h);
       }
       if (step.todo) {
@@ -313,7 +313,8 @@
           '</div>' +
         '</div>';
     } else if (stay.nights > 0) {
-      html += '<div class="itin-note itin-note--todo">' + escapeHtml(stay.todo || 'Hotel da definire.') + '</div>';
+      html += '<div class="itin-note itin-note--todo">🛏 ' + escapeHtml(stay.hotelNote || 'Hotel da definire') + '. ' +
+        escapeHtml(stay.todo || '') + '</div>';
     }
     return html + '</div>';
   }
