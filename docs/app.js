@@ -7,6 +7,7 @@
 //   /citta/ID     città → giorni e punti da vedere
 //   /giorno/DATA  giorno → programma e punti
 //   /punto/ID     punto da vedere
+//   /documenti    voucher e biglietti (cifrati, si aprono con la password)
 // Tutti i contenuti arrivano da data.js.
 
 (() => {
@@ -25,6 +26,8 @@
   const daysOf = (placeId) => DAYS.filter((d) => d.placeId === placeId);
   const pointsOf = (placeId) => POINTS.filter((p) => p.placeId === placeId);
   const photosOf = (placeId) => PHOTOS[placeId] || [];
+  const remindersOn = (date) => REMINDERS.filter((r) => r.date === date);
+  const telHref = (n) => 'tel:' + n.replace(/[^+\d]/g, '');
   const movesOn = (date) => TRIP.steps.filter((s) => s.type === 'move' && s.date === date);
   const daysWithPoint = (pid) => DAYS.filter((d) => d.points.includes(pid));
   const pointPhoto = (pt) => (pt.photo !== undefined ? photosOf(pt.placeId)[pt.photo] : null);
@@ -67,6 +70,7 @@
         '<div class="move__meta">' + (asCard ? fmtDate(m.date) + ' · ' : '') + esc(m.mode) + ' · ' + esc(m.time) + '</div>' +
         (m.detail ? '<div class="move__detail">' + esc(m.detail) + '</div>' : '') +
         (m.status === 'todo' ? '<div class="chips"><span class="chip chip--warn">Mezzo da definire</span></div>' : '') +
+        (m.docId ? '<div class="btn-row" style="margin-top:8px"><a class="btn" href="#/documenti/' + m.docId + '">🔒 Biglietto e codici</a></div>' : '') +
       '</div></div>';
   }
   function dayRow(d) {
@@ -89,16 +93,31 @@
   }
   function hotelCard(h, extra) {
     return '<div class="card card--accent" style="--c:#211C18">' +
-      '<h3>🛏 ' + esc(h.name) + (h.cnName ? ' <span class="cn">' + esc(h.cnName) + '</span>' : '') + '</h3>' +
+      '<h3>🛏 ' + esc(h.name) + '</h3>' +
+      (h.cnName ? '<div class="kv cn" style="font-size:15px">' + esc(h.cnName) + '</div>' : '') +
       '<div class="kv">' + esc(h.address) + '</div>' +
-      '<div class="kv">Check-in <b>' + fmtDate(h.checkIn) + '</b> · check-out <b>' + fmtDate(h.checkOut) + '</b> · ' + nightsLabel(h.nights) + '</div>' +
+      (h.cnAddress ? '<div class="kv cn">' + esc(h.cnAddress) + '</div>' : '') +
+      '<div class="kv">Check-in <b>' + fmtDate(h.checkIn) + '</b>' + (h.checkInTime ? ' ' + esc(h.checkInTime) : '') +
+        ' · check-out <b>' + fmtDate(h.checkOut) + '</b>' + (h.checkOutTime ? ' ' + esc(h.checkOutTime) : '') + ' · ' + nightsLabel(h.nights) + '</div>' +
+      (h.phones ? '<div class="kv">📞 ' + h.phones.map((p) => '<a href="' + telHref(p) + '">' + esc(p) + '</a>').join(' · ') + '</div>' : '') +
+      (h.breakfast ? '<div class="kv">☕ ' + esc(h.breakfast) + '</div>' : '') +
+      (extra && h.perks ? '<div class="kv">🎁 ' + esc(h.perks) + '</div>' : '') +
+      (extra && h.cancel ? '<div class="kv">↩︎ ' + esc(h.cancel) + '</div>' : '') +
       (extra ? '<p class="small muted">' + esc(h.info) + '</p>' : '') +
       '<div class="btn-row">' +
-        '<button class="btn" type="button" data-driver="' + h.id + '">Mostra all’autista</button>' +
+        '<button class="btn btn--primary" type="button" data-driver="' + h.id + '">🚕 Mostra all’autista</button>' +
+        '<a class="btn" href="#/documenti/' + h.id + '">🔒 Voucher</a>' +
         '<a class="btn" href="#/mappa/hotel/' + h.id + '">Sulla mappa</a>' +
         '<a class="btn" href="' + esc(h.link) + '" target="_blank" rel="noopener">Scheda ↗</a>' +
       '</div></div>';
   }
+  function reminderHtml(r, withDate) {
+    return '<div class="card card--accent" style="--c:#D9A441">' +
+      '<h3>⏰ ' + esc(r.title) + '</h3>' + (withDate ? '<div class="kv"><b>' + fmtDate(r.date) + '</b></div>' : '') +
+      '<p>' + esc(r.text) + '</p>' +
+      (r.link ? '<div class="btn-row"><a class="btn" href="' + esc(r.link) + '" target="_blank" rel="noopener">Apri il sito ↗</a></div>' : '') + '</div>';
+  }
+
   function creditsHtml(photos) {
     if (!photos.length) return '';
     return '<div class="credits">Foto: ' + photos.map((ph) =>
@@ -214,9 +233,11 @@
         '<div class="countdown__label">' + (n === 1 ? 'giorno alla partenza' : 'giorni alla partenza') + '</div>' +
         '<div class="countdown__sub">Arrivo a Shanghai ' + fmtLong(first) + ' · rientro ' + fmtLong(last) + '</div></div>';
       html += section('Il primo giorno', '<div class="list">' + dayRow(DAYS[0]) + '</div>');
+      html += section('Promemoria in viaggio', REMINDERS.map((r) => reminderHtml(r, true)).join(''));
       html += section('Prima di partire', '<div class="card"><ul class="checklist">' +
         '<li>Installate questa app sul telefono (vedi Info › App offline) e apritela almeno una volta con internet.</li>' +
         '<li>Aprite le pagine delle città e la mappa ingrandendo sulle zone degli hotel: le mappe viste restano salvate per l’uso offline.</li>' +
+        '<li>Aprite Info › Documenti, inserite la password e spuntate “Ricorda su questo telefono”: voucher e biglietti saranno disponibili offline.</li>' +
         '<li>Registrate il viaggio su Dove Siamo nel Mondo (app Viaggiare Sicuri).</li>' +
         '<li>Configurate Alipay o WeChat Pay e scaricate le app utili (vedi Info).</li>' +
         '</ul></div>');
@@ -295,6 +316,8 @@
     if (!compact) html += '<a class="chip" href="#/citta/' + place.id + '" style="text-decoration:none">← ' + esc(place.name) + '</a>';
     html += '<section class="section" style="margin-top:12px"><h2 class="serif" style="margin:0;font-size:26px;line-height:1.2;font-weight:600">' + esc(d.title) + '</h2>' +
       (d.plan ? '<p class="lead" style="margin-top:8px">' + esc(d.plan) + '</p>' : '') + '</section>';
+    const rem = remindersOn(d.date);
+    if (rem.length) html += section('Promemoria', rem.map((r) => reminderHtml(r, false)).join(''));
     const moves = movesOn(d.date);
     if (moves.length) html += section('Spostamenti', moves.map((m) => moveHtml(m, true)).join(''));
     const pts = d.points.map(pointById).filter(Boolean);
@@ -352,6 +375,10 @@
 
   function pageInfo() {
     let html = '';
+    html += section('Documenti di viaggio', '<a class="list" href="#/documenti" style="display:block;text-decoration:none">' +
+      '<span class="row"><span class="row__num" style="--c:#211C18">🔒</span><span class="row__text"><span class="row__title">Voucher, biglietti e codici</span>' +
+      '<span class="row__sub">PNR, biglietti elettronici, conferme e PIN degli hotel · protetti da password</span></span><span class="row__chev">›</span></span></a>');
+    html += section('Promemoria', REMINDERS.map((r) => reminderHtml(r, true)).join(''));
     html += section('Voli e treni', TRIP.steps.filter((s) => s.type === 'move').map((m) => moveHtml(m, true)).join(''));
     html += section('Hotel', HOTELS.map((h) => hotelCard(h, false)).join('') +
       STAYS.filter((s) => s.nights > 0 && !s.hotelId).map((s) => '<div class="empty" style="margin-top:10px">🛏 ' + esc(placeById(s.placeId).name) + ': ' + esc(s.hotelNote || 'hotel da definire') + '</div>').join(''));
@@ -371,6 +398,70 @@
       '<b>Android:</b> apri il link in Chrome › menu ⋮ › “Installa app” o “Aggiungi a schermata Home”.</p>' +
       '<p class="small muted">Le mappe funzionano offline solo nelle zone già visualizzate con internet.</p></div>');
     return { title: 'Info utili', eyebrow: 'Viaggio in Cina', html, after: updateOfflineStatus };
+  }
+
+  // ── Documenti cifrati ────────────────────────────────────────────────
+  // documenti.enc.json è cifrato con AES-GCM (chiave da PBKDF2-SHA256 della
+  // password, vedi tools/cifra_documenti.js): sul sito pubblico è illeggibile.
+  const PW_KEY = 'cina-documenti-pw';
+  let vault = null;
+  const b64 = (str) => Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
+  async function openVault(password) {
+    const box = await fetch('documenti.enc.json').then((r) => r.json());
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(box.salt), iterations: box.iter, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(box.iv) }, key, b64(box.data));
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+  const savedPw = () => { try { return localStorage.getItem(PW_KEY); } catch (e) { return null; } };
+
+  function vaultCardHtml(c) {
+    return '<div class="card" id="doc-' + esc(c.id) + '" style="margin-top:12px">' +
+      '<h3>' + esc(c.title) + '</h3><div class="kv muted">' + fmtDate(c.date) + '</div>' +
+      '<table class="codes">' + c.rows.map(([k, v]) => '<tr><th>' + esc(k) + '</th><td>' + esc(v) + '</td></tr>').join('') + '</table>' +
+      c.pages.map((src) => '<img class="doc-page" src="' + src + '" alt="' + esc(c.title) + '">').join('') + '</div>';
+  }
+  function renderVault(onlyId) {
+    const el = document.getElementById('vaultBox');
+    if (!el) return;
+    const cards = onlyId ? vault.cards.filter((c) => c.id === onlyId) : vault.cards;
+    el.innerHTML = (onlyId ? '<a class="chip" href="#/documenti" style="text-decoration:none">Tutti i documenti</a>' : '') +
+      cards.map(vaultCardHtml).join('') +
+      '<div class="btn-row"><button class="btn" type="button" id="lockBtn">Blocca e dimentica la password su questo telefono</button></div>';
+    document.getElementById('lockBtn').addEventListener('click', () => {
+      vault = null; try { localStorage.removeItem(PW_KEY); } catch (e) {}
+      route();
+    });
+  }
+  function pageDocs(onlyId) {
+    const html = '<p class="lead">Voucher degli hotel, biglietti e codici di prenotazione. Sono cifrati: sul sito pubblico nessuno può leggerli senza la password.</p>' +
+      '<section class="section" id="vaultBox"><form class="card" id="unlockForm">' +
+        '<h3>🔒 Inserite la password</h3>' +
+        '<input class="input" id="pwInput" type="password" autocomplete="current-password" placeholder="xxxx-xxxx-xxxx" required>' +
+        '<label class="check"><input type="checkbox" id="pwRemember" checked> Ricorda su questo telefono (resta disponibile offline)</label>' +
+        '<div class="btn-row"><button class="btn btn--primary" type="submit" id="unlockBtn">Apri i documenti</button></div>' +
+        '<p class="small muted" id="unlockMsg"></p>' +
+      '</form></section>';
+    const after = () => {
+      if (vault) { renderVault(onlyId); return; }
+      const form = document.getElementById('unlockForm');
+      const msg = document.getElementById('unlockMsg');
+      const tryOpen = async (pw, remember) => {
+        msg.textContent = 'Apertura in corso…';
+        try {
+          vault = await openVault(pw.trim());
+          if (remember) { try { localStorage.setItem(PW_KEY, pw.trim()); } catch (e) {} }
+          renderVault(onlyId);
+        } catch (e) {
+          msg.textContent = e && e.name === 'OperationError' ? 'Password errata.' : 'Impossibile aprire i documenti: ' + (e && e.message ? e.message : e);
+        }
+      };
+      form.addEventListener('submit', (e) => { e.preventDefault(); tryOpen(document.getElementById('pwInput').value, document.getElementById('pwRemember').checked); });
+      const pw = savedPw();
+      if (pw) tryOpen(pw, false);
+    };
+    return { title: 'Documenti', eyebrow: 'Protetti da password', back: true, parent: '#/info', html, after };
   }
 
   function notFound() {
@@ -401,6 +492,7 @@
       case 'citta': page = pageCity(parts[1]); tab = 'itinerario'; break;
       case 'giorno': page = pageDay(parts[1]); tab = 'itinerario'; break;
       case 'punto': page = pagePoint(parts[1]); tab = 'itinerario'; break;
+      case 'documenti': page = pageDocs(parts[1]); tab = 'info'; break;
       default: page = notFound();
     }
     document.getElementById('topTitle').textContent = page.title;
@@ -429,9 +521,12 @@
     if (!b) return;
     const h = hotelById(b.dataset.driver);
     document.getElementById('driverBody').innerHTML =
-      (h.cnName ? '<div class="driver__cn">' + esc(h.cnName) + '</div>' : '') +
+      '<div class="driver__label">请带我去 · Per favore, portatemi a:</div>' +
+      '<div class="driver__cn">' + esc(h.cnName) + '</div>' +
+      '<div class="driver__addr">' + esc(h.cnAddress) + '</div>' +
+      (h.phones ? '<div class="driver__tel">酒店电话 · ' + h.phones.map((p) => '<a href="' + telHref(p) + '">' + esc(p) + '</a>').join('<br>') + '</div>' : '') +
       '<div class="driver__en"><b>' + esc(h.name) + '</b><br>' + esc(h.address) + '</div>' +
-      '<div class="driver__hint">Mostrate questa schermata al tassista.' + (h.cnName ? '' : ' Nome cinese dell’hotel non ancora inserito: chiedetelo alla reception e aggiungetelo.') + '</div>';
+      '<div class="driver__hint">Mostrate questa schermata al tassista; se serve, fategli chiamare l’hotel.</div>';
     driver.hidden = false;
   });
   document.getElementById('driverClose').addEventListener('click', () => { driver.hidden = true; });
