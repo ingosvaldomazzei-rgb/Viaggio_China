@@ -26,6 +26,12 @@ Tutto in `data.js`:
 - `PHOTOS` — foto da Wikimedia Commons con autore e licenza (vanno sempre citati).
 - `INFO` — numeri utili (verificati sui siti ufficiali a ottobre 2026) e app consigliate.
 
+## Documenti cifrati (voucher, biglietti, codici)
+
+`docs/documenti.enc.json` contiene voucher degli hotel, biglietti e codici di prenotazione, cifrati con AES-GCM (chiave PBKDF2-SHA256, 600.000 iterazioni). Sul sito pubblico è illeggibile; l'app lo apre nella pagina **Documenti** con la password, anche offline, e può ricordarla sul telefono.
+
+Per rigenerarlo (nuovi documenti o nuova password): mettere in una cartella **fuori dal repository** `codici.json` e le immagini `<id>-1.jpg`, `<id>-2.jpg`…, poi `PASSWORD='...' node tools/cifra_documenti.js CARTELLA`. Non aggiungere mai al repository i PDF o le immagini originali.
+
 ## Dopo ogni modifica
 
 Lanciare `python3 tools/aggiorna_offline.py`: rigenera `sw.js` (elenco dei file salvati sul telefono e versione). Se cambiano `app.js`, `data.js` o `styles.css`, aumentare anche il numero `?v=` in `index.html` prima di lanciarlo.
