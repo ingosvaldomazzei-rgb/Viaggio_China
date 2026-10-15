@@ -26,6 +26,7 @@
   const daysOf = (placeId) => DAYS.filter((d) => d.placeId === placeId);
   const pointsOf = (placeId) => POINTS.filter((p) => p.placeId === placeId);
   const photosOf = (placeId) => PHOTOS[placeId] || [];
+  REMINDERS.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   const remindersOn = (date) => REMINDERS.filter((r) => r.date === date);
   const telHref = (n) => 'tel:' + n.replace(/[^+\d]/g, '');
   const movesOn = (date) => TRIP.steps.filter((s) => s.type === 'move' && s.date === date);
