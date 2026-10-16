@@ -3,8 +3,9 @@
 //   /             Oggi: conto alla rovescia, poi il giorno corrente
 //   /itinerario   tappe in ordine con spostamenti
 //   /mappa        mappa del viaggio
-//   /info         voli, hotel, numeri utili
-//   /citta/ID     città → giorni e punti da vedere
+//   /info[/SEZ]   indice delle info utili e sue sottopagine
+//   /citta/ID     città → giorni e categorie di punti
+//   /citta/ID/CAT punti di una categoria (vedere, divertimento, mangiare, cocktail)
 //   /giorno/DATA  giorno → programma e punti
 //   /punto/ID     punto da vedere
 //   /documenti    voucher e biglietti (cifrati, si aprono con la password)
@@ -25,6 +26,14 @@
   const stayOf = (placeId) => STAYS.find((s) => s.placeId === placeId);
   const daysOf = (placeId) => DAYS.filter((d) => d.placeId === placeId);
   const pointsOf = (placeId) => POINTS.filter((p) => p.placeId === placeId);
+  const CATS = [
+    { id: 'vedere', icon: '🏛', label: 'Da visitare' },
+    { id: 'divertimento', icon: '🎉', label: 'Divertimenti' },
+    { id: 'mangiare', icon: '🍽', label: 'Mangiare, tè e caffè' },
+    { id: 'cocktail', icon: '🍸', label: 'Cocktail' },
+  ];
+  const catOf = (id) => CATS.find((c) => c.id === id) || CATS[0];
+  const groupByCat = (pts) => CATS.map((c) => ({ cat: c, pts: pts.filter((p) => (p.cat || 'vedere') === c.id) })).filter((g) => g.pts.length);
   const photosOf = (placeId) => PHOTOS[placeId] || [];
   REMINDERS.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   const remindersOn = (date) => REMINDERS.filter((r) => r.date === date);
@@ -87,7 +96,7 @@
   function pointRow(pt) {
     const ph = pointPhoto(pt);
     return '<a class="row" href="#/punto/' + pt.id + '">' +
-      (ph ? '<img class="row__thumb" src="' + esc(ph.src) + '" alt="" loading="lazy">' : '<span class="row__thumb"></span>') +
+      (ph ? '<img class="row__thumb" src="' + esc(ph.src) + '" alt="" loading="lazy">' : '<span class="row__thumb row__thumb--icon">' + catOf(pt.cat).icon + '</span>') +
       '<span class="row__text"><span class="row__title">' + esc(pt.name) + (pt.cnName ? ' <span class="cn">' + esc(pt.cnName) + '</span>' : '') + '</span>' +
         '<span class="row__sub">' + esc(pt.summary || 'Dettagli da completare') + '</span></span>' +
       '<span class="row__chev">›</span></a>';
@@ -236,7 +245,7 @@
       html += section('Il primo giorno', '<div class="list">' + dayRow(DAYS[0]) + '</div>');
       html += section('Promemoria in viaggio', REMINDERS.map((r) => reminderHtml(r, true)).join(''));
       html += section('Prima di partire', '<div class="card"><ul class="checklist">' +
-        '<li>Installate questa app sul telefono (vedi Info › App offline) e apritela almeno una volta con internet.</li>' +
+        '<li>Installate questa app sul telefono (vedi Info › App utili e uso offline) e apritela almeno una volta con internet.</li>' +
         '<li>Aprite le pagine delle città e la mappa ingrandendo sulle zone degli hotel: le mappe viste restano salvate per l’uso offline.</li>' +
         '<li>Aprite Info › Documenti, inserite la password e spuntate “Ricorda su questo telefono”: voucher e biglietti saranno disponibili offline.</li>' +
         '<li>Registrate il viaggio su Dove Siamo nel Mondo (app Viaggiare Sicuri).</li>' +
@@ -300,7 +309,11 @@
       '<span class="chip">' + esc(place.type) + '</span></div>';
     html += '<section class="section"><p class="lead">' + esc(place.description) + '</p></section>';
     if (days.length) html += section('I giorni a ' + place.name, '<div class="list">' + days.map(dayRow).join('') + '</div>');
-    if (pts.length) html += section('Punti da vedere', '<div class="list">' + pts.map(pointRow).join('') + '</div>');
+    if (pts.length) html += section('Cosa fare a ' + place.name, '<div class="list">' + groupByCat(pts).map((g) =>
+      '<a class="row" href="#/citta/' + place.id + '/' + g.cat.id + '"><span class="row__num" style="--c:' + place.color + '">' + g.cat.icon + '</span>' +
+      '<span class="row__text"><span class="row__title">' + esc(g.cat.label) + '</span>' +
+      '<span class="row__sub">' + g.pts.length + (g.pts.length === 1 ? ' posto' : ' posti') + ' · ' + esc(g.pts.slice(0, 3).map((p) => p.name).join(', ')) + (g.pts.length > 3 ? '…' : '') + '</span></span>' +
+      '<span class="row__chev">›</span></a>').join('') + '</div>');
     if (hotel) html += section('Dove dormite', hotelCard(hotel, true));
     else if (st && st.nights > 0) html += section('Dove dormite', '<div class="empty">🛏 ' + esc(st.hotelNote || 'Hotel da definire') + (st.todo ? '. ' + esc(st.todo) : '') + '</div>');
     html += section('Come arrivare', '<div class="card"><p style="margin:0">' + esc(place.howToGet) + '</p></div>');
@@ -310,6 +323,19 @@
     } else html += creditsHtml(photos);
     return { title: place.name, eyebrow: st ? 'Tappa ' + st.order + ' · ' + fmtRange(st.from, st.to) : 'Transito', back: true, parent: '#/itinerario',
       html, after: () => miniMap(document.getElementById('miniMap'), place, pts, hotel) };
+  }
+
+  function pageCityCat(id, catId) {
+    const place = placeById(id);
+    if (!place) return notFound();
+    const cat = catOf(catId);
+    const pts = pointsOf(id).filter((p) => (p.cat || 'vedere') === cat.id);
+    const html = (pts.length ? '<div class="list">' + pts.map(pointRow).join('') + '</div>'
+      : '<div class="empty">Ancora niente in questa categoria.</div>') +
+      (pts.some((p) => p.coords) ? section('Sulla mappa', '<div class="map-mini" id="miniMap"></div>') : '');
+    const hotel = (stayOf(id) || {}).hotelId ? hotelById(stayOf(id).hotelId) : null;
+    return { title: cat.icon + ' ' + cat.label, eyebrow: place.name, back: true, parent: '#/citta/' + id,
+      html, after: pts.some((p) => p.coords) ? () => miniMap(document.getElementById('miniMap'), place, pts, hotel) : null };
   }
 
   function dayBody(d, place, compact) {
@@ -322,8 +348,8 @@
     const moves = movesOn(d.date);
     if (moves.length) html += section('Spostamenti', moves.map((m) => moveHtml(m, true)).join(''));
     const pts = d.points.map(pointById).filter(Boolean);
-    html += section('In programma', pts.length ? '<div class="list">' + pts.map(pointRow).join('') + '</div>'
-      : '<div class="empty">Programma da definire: ancora nessun punto assegnato a questo giorno.</div>');
+    if (!pts.length) html += section('In programma', '<div class="empty">Programma da definire: ancora nessun punto assegnato a questo giorno.</div>');
+    else groupByCat(pts).forEach((g) => { html += section(g.cat.icon + ' ' + g.cat.label, '<div class="list">' + g.pts.map(pointRow).join('') + '</div>'); });
     const night = hotelForNight(d.date);
     if (night) {
       html += section('Stanotte', night.hotel ? hotelCard(night.hotel, false)
@@ -370,35 +396,56 @@
       html += '<div class="btn-row"><a class="btn" href="https://uri.amap.com/search?keyword=' + encodeURIComponent(pt.cnName) + '" target="_blank" rel="noopener">Apri in Amap ↗</a></div>';
     }
     if (ph) html += creditsHtml([ph]);
-    return { title: pt.name, eyebrow: place.name, back: true, parent: '#/citta/' + place.id,
+    return { title: pt.name, eyebrow: place.name + ' · ' + catOf(pt.cat).label, back: true, parent: '#/citta/' + place.id + '/' + catOf(pt.cat).id,
       html, after: pt.coords ? () => miniMap(document.getElementById('miniMap'), place, [pt], null) : null };
   }
 
-  function pageInfo() {
-    let html = '';
-    html += section('Documenti di viaggio', '<a class="list" href="#/documenti" style="display:block;text-decoration:none">' +
-      '<span class="row"><span class="row__num" style="--c:#211C18">🔒</span><span class="row__text"><span class="row__title">Voucher, biglietti e codici</span>' +
-      '<span class="row__sub">PNR, biglietti elettronici, conferme e PIN degli hotel · protetti da password</span></span><span class="row__chev">›</span></span></a>');
-    html += section('Promemoria', REMINDERS.map((r) => reminderHtml(r, true)).join(''));
-    html += section('Voli e treni', TRIP.steps.filter((s) => s.type === 'move').map((m) => moveHtml(m, true)).join(''));
-    html += section('Hotel', HOTELS.map((h) => hotelCard(h, false)).join('') +
-      STAYS.filter((s) => s.nights > 0 && !s.hotelId).map((s) => '<div class="empty" style="margin-top:10px">🛏 ' + esc(placeById(s.placeId).name) + ': ' + esc(s.hotelNote || 'hotel da definire') + '</div>').join(''));
-    html += section('Emergenze in Cina', '<div class="list">' + INFO.emergency.map((e) =>
-      '<a class="tel" href="tel:' + e.number + '"><span>' + esc(e.label) + '</span><span class="tel__num">' + e.number + '</span></a>').join('') + '</div>');
-    html += section('Ambasciata e consolati', INFO.consular.map((c) =>
-      '<div class="card"><h3>' + esc(c.label) + '</h3>' +
-        (c.phone ? '<div class="kv">Ufficio: <a href="tel:' + c.phone.replace(/\s/g, '') + '"><b>' + esc(c.phone) + '</b></a></div>' : '') +
-        (c.emergency ? '<div class="kv">Emergenze: <a href="tel:' + c.emergency.replace(/\s/g, '') + '"><b>' + esc(c.emergency) + '</b></a></div>' : '') +
-        '<p class="small muted">' + esc(c.note) + '</p>' +
-        '<div class="btn-row"><a class="btn" href="' + esc(c.link) + '" target="_blank" rel="noopener">Sito ufficiale ↗</a></div></div>').join(''));
-    html += section('App utili', '<div class="list">' + INFO.apps.map((a) =>
-      '<div class="row"><span class="row__text"><span class="row__title">' + esc(a.name) + '</span><span class="row__sub">' + esc(a.why) + '</span></span></div>').join('') + '</div>');
-    html += section('App offline', '<div class="card" id="offlineCard">' +
-      '<p style="margin:0" id="offlineStatus">Controllo in corso…</p>' +
-      '<p class="small muted"><b>iPhone:</b> apri il link in Safari › tasto Condividi › “Aggiungi alla schermata Home”.<br>' +
-      '<b>Android:</b> apri il link in Chrome › menu ⋮ › “Installa app” o “Aggiungi a schermata Home”.</p>' +
-      '<p class="small muted">Le mappe funzionano offline solo nelle zone già visualizzate con internet.</p></div>');
-    return { title: 'Info utili', eyebrow: 'Viaggio in Cina', html, after: updateOfflineStatus };
+  const INFO_SECTIONS = [
+    { id: 'documenti', icon: '🔒', title: 'Documenti di viaggio', sub: 'Arrival card, voucher, biglietti, PNR e PIN · con password', href: '#/documenti' },
+    { id: 'promemoria', icon: '⏰', title: 'Promemoria', sub: 'Prenotazioni e partenze da non dimenticare' },
+    { id: 'trasporti', icon: '✈', title: 'Voli e treni', sub: 'Tutti gli spostamenti, con orari e consigli' },
+    { id: 'hotel', icon: '🛏', title: 'Hotel', sub: 'Indirizzi, telefoni, check-in, “mostra all’autista”' },
+    { id: 'emergenze', icon: '🆘', title: 'Emergenze e ambasciata', sub: 'Numeri cinesi, Ambasciata, Consolati, Unità di Crisi' },
+    { id: 'app', icon: '📱', title: 'App utili e uso offline', sub: 'App da scaricare, stato del salvataggio sul telefono' },
+  ];
+  function pageInfo(sub) {
+    if (!sub) {
+      const html = '<div class="list">' + INFO_SECTIONS.map((x) =>
+        '<a class="row" href="' + (x.href || '#/info/' + x.id) + '"><span class="row__num" style="--c:#211C18">' + x.icon + '</span>' +
+        '<span class="row__text"><span class="row__title">' + esc(x.title) + '</span><span class="row__sub">' + esc(x.sub) + '</span></span>' +
+        '<span class="row__chev">›</span></a>').join('') + '</div>';
+      return { title: 'Info utili', eyebrow: 'Viaggio in Cina', html };
+    }
+    const meta = INFO_SECTIONS.find((x) => x.id === sub);
+    if (!meta) return notFound();
+    let html = '', after = null;
+    if (sub === 'promemoria') html = REMINDERS.map((r) => reminderHtml(r, true)).join('');
+    if (sub === 'trasporti') html = TRIP.steps.filter((x) => x.type === 'move').map((m) => moveHtml(m, true)).join('');
+    if (sub === 'hotel') {
+      html = HOTELS.map((h) => hotelCard(h, false)).join('') +
+        STAYS.filter((x) => x.nights > 0 && !x.hotelId).map((x) => '<div class="empty" style="margin-top:10px">🛏 ' + esc(placeById(x.placeId).name) + ': ' + esc(x.hotelNote || 'hotel da definire') + '</div>').join('');
+    }
+    if (sub === 'emergenze') {
+      html = section('Emergenze in Cina', '<div class="list">' + INFO.emergency.map((e) =>
+        '<a class="tel" href="tel:' + e.number + '"><span>' + esc(e.label) + '</span><span class="tel__num">' + e.number + '</span></a>').join('') + '</div>');
+      html += section('Ambasciata e consolati', INFO.consular.map((c) =>
+        '<div class="card"><h3>' + esc(c.label) + '</h3>' +
+          (c.phone ? '<div class="kv">Ufficio: <a href="tel:' + c.phone.replace(/\s/g, '') + '"><b>' + esc(c.phone) + '</b></a></div>' : '') +
+          (c.emergency ? '<div class="kv">Emergenze: <a href="tel:' + c.emergency.replace(/\s/g, '') + '"><b>' + esc(c.emergency) + '</b></a></div>' : '') +
+          '<p class="small muted">' + esc(c.note) + '</p>' +
+          '<div class="btn-row"><a class="btn" href="' + esc(c.link) + '" target="_blank" rel="noopener">Sito ufficiale ↗</a></div></div>').join(''));
+    }
+    if (sub === 'app') {
+      html = section('App utili', '<div class="list">' + INFO.apps.map((a) =>
+        '<div class="row"><span class="row__text"><span class="row__title">' + esc(a.name) + '</span><span class="row__sub">' + esc(a.why) + '</span></span></div>').join('') + '</div>');
+      html += section('Uso offline', '<div class="card" id="offlineCard">' +
+        '<p style="margin:0" id="offlineStatus">Controllo in corso…</p>' +
+        '<p class="small muted"><b>iPhone:</b> apri il link in Safari › tasto Condividi › “Aggiungi alla schermata Home”.<br>' +
+        '<b>Android:</b> apri il link in Chrome › menu ⋮ › “Installa app” o “Aggiungi a schermata Home”.</p>' +
+        '<p class="small muted">Le mappe funzionano offline solo nelle zone già visualizzate con internet.</p></div>');
+      after = updateOfflineStatus;
+    }
+    return { title: meta.icon + ' ' + meta.title, eyebrow: 'Info utili', back: true, parent: '#/info', html, after };
   }
 
   // ── Documenti cifrati ────────────────────────────────────────────────
@@ -489,8 +536,8 @@
       case undefined: page = pageToday(); break;
       case 'itinerario': page = pageItinerary(); tab = 'itinerario'; break;
       case 'mappa': page = pageMap(parts[1] === 'hotel' ? parts[2] : null); tab = 'mappa'; break;
-      case 'info': page = pageInfo(); tab = 'info'; break;
-      case 'citta': page = pageCity(parts[1]); tab = 'itinerario'; break;
+      case 'info': page = pageInfo(parts[1]); tab = 'info'; break;
+      case 'citta': page = parts[2] ? pageCityCat(parts[1], parts[2]) : pageCity(parts[1]); tab = 'itinerario'; break;
       case 'giorno': page = pageDay(parts[1]); tab = 'itinerario'; break;
       case 'punto': page = pagePoint(parts[1]); tab = 'itinerario'; break;
       case 'documenti': page = pageDocs(parts[1]); tab = 'info'; break;

@@ -103,6 +103,7 @@ img { display: block; max-width: 100%; }
 .row + .row { border-top: 1px solid #EFE8DA; }
 .row:active { background: #F6F0E4; }
 .row__thumb { flex: none; width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: #EFE8D8; }
+.row__thumb--icon { display: flex; align-items: center; justify-content: center; font-size: 24px; }
 .row__badge { flex: none; width: 40px; text-align: center; line-height: 1.1; }
 .row__badge-day { display: block; font-size: 19px; font-weight: 800; color: var(--c, var(--accent)); }
 .row__badge-month { display: block; font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
