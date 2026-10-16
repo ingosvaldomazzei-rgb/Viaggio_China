@@ -10,7 +10,7 @@ const REGIONS = [
     { id: 'suzhou', name: 'Suzhou', cnName: '苏州', coords: [31.2989, 120.5853], type: 'Città',
       description: "La Venezia d'Oriente, celebre per i giardini classici patrimonio UNESCO: microcosmi di rocce, acqua e padiglioni concepiti come dipinti tridimensionali. Canali, ponti in pietra e l'antica tradizione della seta completano il fascino della città vecchia.",
       howToGet: "Il 17 dall'aeroporto PVG: Airport Link Line fino a Hongqiao, poi treno AV (~1h 30m in tutto)." },
-    { id: 'tongli', name: 'Tongli', cnName: '同里', coords: [31.1560, 120.7250], type: 'Borgo d’acqua',
+    { id: 'tongli', name: 'Tongli', cnName: '同里', coords: [31.1600, 120.7180], type: 'Borgo d’acqua',
       description: "Uno dei borghi d'acqua più armoniosi vicino a Suzhou: una rete di canali attraversati da ponti in pietra, case affacciate sull'acqua e il raffinato giardino Tuisi. Perfetto per una mezza giornata in barca a remi, lontano dalla folla.",
       howToGet: "Da Suzhou ~50 min in taxi/Didi (28 km), oppure metro linea 4 + bus (~1h 40m)." },
   ]},
@@ -45,7 +45,7 @@ const HOTELS = [
   { id: 'h-tongli', placeId: 'tongli', name: 'Floral Hotel · Tongli Ancient Town Jianyuan Inn',
     cnName: '花筑·简园客栈(同里古镇景区店)', cnAddress: '江苏省苏州市吴江区同里古镇东溪街38号',
     address: 'No. 38 Dongxi Street, Tongli Ancient Town, Wujiang District, Suzhou',
-    coords: [31.1585, 120.7240], precise: false,
+    coords: [31.1600, 120.7185], precise: false,
     coordsNote: 'Posizione indicativa nel centro della città antica: la via non è mappata su OpenStreetMap.',
     checkIn: '2026-10-17', checkOut: '2026-10-18', nights: 1,
     info: 'Dentro la città antica di Tongli, 14 camere con cortile interno. Queen Room with Window, già pagata (Agoda).',
@@ -114,12 +114,14 @@ const TRIP = {
       tip: 'Avrete i bagagli con voi tutto il giorno: valutate il deposito bagagli in stazione.' },
     { type: 'move', date: '2026-10-17', status: 'todo',
       title: 'Suzhou → Tongli (sera)',
-      mode: 'Taxi/Didi, oppure metro linea 4 + bus', time: '~50 min in taxi (28 km) · ~1h 40m con i mezzi' },
+      mode: 'Taxi/Didi dalla stazione di Suzhou', time: '~50 min (28 km)',
+      detail: 'Prima si ritirano i bagagli al deposito della stazione (piazza nord, aperto fino alle 22:00 secondo le guide). Alternativa economica: metro linea 4 + bus, ~1h 40m.' },
     { type: 'stay', placeId: 'tongli', from: '2026-10-17', to: '2026-10-18', nights: 1, hotelId: 'h-tongli',
       plan: 'Notte nella città antica. Il 18 altro giro tra Tongli e Suzhou.' },
     { type: 'move', date: '2026-10-18', status: 'todo',
-      title: 'Tongli / Suzhou → Shanghai',
-      mode: 'Treno AV da Suzhou, oppure auto da Tongli', time: '~25–40 min in treno AV · ~1h 30m in auto' },
+      title: 'Tongli → lago Jinji → Shanghai',
+      mode: 'Auto (Didi o con autista) + treno alta velocità', time: '~40 min fino al lago · ~25–35 min di treno',
+      detail: 'Con i bagagli in auto conviene un’auto con autista per la mezza giornata (Tongli → Porta d’Oriente → Museo → stazione). Treno dalla stazione Suzhou Industrial Park (苏州园区站, ~10 min dal lago): meglio verso la stazione di Shanghai (上海站), più vicina al Neobridge di Hongqiao. Non tutti i treni fermano a Suzhou Industrial Park: controllate sull’app.' },
     { type: 'stay', placeId: 'shanghai', from: '2026-10-18', to: '2026-10-22', nights: 4, hotelId: 'h-shanghai',
       plan: 'Sera del 18, poi 19, 20 e 21 pieni a Shanghai.',
       tip: 'Il 22 il volo parte alle 06:55: preparate i bagagli la sera prima e prenotate un taxi/Didi per le 5:00.' },
@@ -202,13 +204,14 @@ const PHOTOS = {
 // photo (indice in PHOTOS[placeId]), hours (orari), tickets (biglietti e
 // prenotazione), tips (elenco di consigli). Per ora c'è solo il nome.
 const POINTS = [
-  { id: "suzhou-giardini-classici", placeId: "suzhou", name: "Giardini classici", photo: 0 },
-  { id: "suzhou-canali", placeId: "suzhou", name: "Canali", photo: 1 },
-  { id: "suzhou-seta", placeId: "suzhou", name: "Seta" },
-  { id: "suzhou-citta-vecchia", placeId: "suzhou", name: "Città vecchia" },
-  { id: "tongli-canali-e-ponti", placeId: "tongli", name: "Canali e ponti", photo: 0 },
-  { id: "tongli-giardino-tuisi", placeId: "tongli", name: "Giardino Tuisi", photo: 1 },
-  { id: "tongli-barche-a-remi", placeId: "tongli", name: "Barche a remi" },
+  { id: "suzhou-amministratore-umile", placeId: "suzhou", name: "Giardino dell’Amministratore Umile", cnName: "拙政园", photo: 0, coords: [31.3263, 120.6247], summary: "Il più grande e celebre dei giardini classici di Suzhou, patrimonio UNESCO: stagni, padiglioni, ponti e scorci studiati come dipinti.", hours: "Marzo–ottobre 7:30–17:30 (guide 2026; da verificare al momento della prenotazione).", tickets: "Ingresso a fascia oraria da prenotare in anticipo col passaporto: mini-programma WeChat “苏州园林” oppure Trip.com. Prezzo ¥70–80 secondo le fonti. Sabato 17: prenotate il prima possibile la fascia delle 9:30–10:00.", tips: ["Primo punto della giornata: è a circa 2 km dalla stazione (10 minuti di taxi).", "Contate 1h30–2h per il giro completo.", "Accanto c’è il Museo di Suzhou di I. M. Pei, se avanzasse tempo (anche lì si prenota).", "Uscendo, Pingjiang Road inizia a pochi minuti a piedi verso sud."] },
+  { id: "suzhou-pingjiang-road", placeId: "suzhou", name: "Pingjiang Road", cnName: "平江路", photo: 1, coords: [31.3149, 120.6297], summary: "Strada pedonale lungo un canale nella città vecchia: case bianche, ponti di pietra, case da tè e piccoli ristoranti.", tickets: "Ingresso libero.", tips: ["Ideale per pranzo e una pausa: dopo il volo notturno vi servirà.", "Le traverse laterali sono più tranquille della via principale."] },
+  { id: "suzhou-shantang-street", placeId: "suzhou", name: "Shantang Street", cnName: "山塘街", coords: [31.3218, 120.5978], summary: "L’antica via-canale verso Tiger Hill: di sera le lanterne rosse si riflettono nell’acqua.", hours: "Lanterne accese verso le 18:30 secondo le guide; conviene arrivare tra le 17:30 e le 18:00.", tickets: "Ingresso libero; giro in barca circa ¥30–50 a persona (di sera costa di più).", tips: ["Il tratto più bello è il primo, a est, verso il molo Bai Juyi.", "Sabato sera è molto affollata: un’ora e mezza basta.", "Da qui alla stazione di Suzhou sono circa 10 minuti di taxi."] },
+  { id: "suzhou-porta-d-oriente", placeId: "suzhou", name: "Porta d’Oriente (Gate to the East)", cnName: "东方之门", coords: [31.3192, 120.675], summary: "Il grattacielo ad arco alto 301 metri sulla riva ovest del lago Jinji, simbolo della Suzhou moderna.", tickets: "Vista da fuori: gratis. Metro: stazione Dongfangzhimen (linee 1 e 3).", tips: ["La foto classica è dalla passeggiata sul lago, con l’arco riflesso nell’acqua."] },
+  { id: "suzhou-museo-arte-contemporanea", placeId: "suzhou", name: "Museo di Arte Contemporanea (Suzhou MoCA)", cnName: "苏州当代美术馆", coords: [31.318, 120.7092], summary: "Il nuovo museo progettato da BIG, aperto ad agosto 2026: dodici padiglioni sotto un unico tetto a nastro, sulla riva est del lago Jinji, accanto alla nuova ruota panoramica.", tickets: "Visita solo da fuori: gratis.", tips: ["È sulla riva opposta alla Porta d’Oriente, a circa 3,5 km: 10 minuti di taxi tra i due."] },
+  { id: "tongli-canali-e-ponti", placeId: "tongli", name: "Canali e ponti di Tongli", photo: 0, coords: [31.1605, 120.7195], summary: "La città antica sull’acqua: canali, ponti in pietra (i Tre Ponti) e case affacciate sull’acqua.", hours: "Di giorno si entra col biglietto; dopo le 18:00 le strade sono aperte senza biglietto ma i siti a pagamento sono chiusi (guide).", tickets: "Biglietto ¥80 online (almeno un giorno prima) o ¥100 in biglietteria, secondo le guide; comprende i principali siti, Tuisi incluso.", tips: ["Sera del 17: passeggiata libera tra i canali illuminati.", "Mattina del 18: uscite presto, prima dei gruppi organizzati (verso le 9:30–10)."] },
+  { id: "tongli-giardino-tuisi", placeId: "tongli", name: "Giardino Tuisi", cnName: "退思园", photo: 1, coords: [31.1598, 120.7164], summary: "Il “Giardino della Meditazione in Ritiro” (UNESCO): un piccolo giardino d’acqua con padiglioni costruiti a pelo dell’acqua.", hours: "Di giorno, indicativamente dalle 7:30–8:00 alle 17:00–17:30 (le fonti non concordano).", tickets: "Compreso nel biglietto di Tongli.", tips: ["È il “secondo giardino” della trasferta: al mattino presto, a due passi dall’hotel, al posto di un altro giardino a Suzhou."] },
+  { id: "tongli-barche-a-remi", placeId: "tongli", name: "Barche a remi", summary: "Giro sui canali con barca a remi.", tickets: "A pagamento, prezzo da chiedere al molo." },
   { id: "shanghai-il-bund", placeId: "shanghai", name: "Il Bund", photo: 1 },
   { id: "shanghai-skyline-di-pudong", placeId: "shanghai", name: "Skyline di Pudong", photo: 0 },
   { id: "shanghai-giardino-yu", placeId: "shanghai", name: "Giardino Yu", photo: 2 },
@@ -241,8 +244,8 @@ const POINTS = [
 // Ogni data del viaggio appartiene a una città (placeId) e ha una sua pagina.
 // points: id dei POINTS in programma quel giorno, in ordine di visita.
 const DAYS = [
-  { date: '2026-10-17', placeId: 'suzhou', title: "Arrivo in Cina e giornata a Suzhou", plan: "Atterraggio a Pudong alle 05:50, treno per Suzhou, giornata in città. In serata trasferimento a Tongli, notte nella città antica.", points: [] },
-  { date: '2026-10-18', placeId: 'tongli', title: "Tongli e Suzhou, sera a Shanghai", plan: "Mattina tra Tongli e Suzhou, poi trasferimento a Shanghai per la serata.", points: [] },
+  { date: '2026-10-17', placeId: 'suzhou', title: "Suzhou: giardino, Pingjiang Road e Shantang", plan: "Proposta: verso le 8:45 a Suzhou, bagagli al deposito della stazione. Giardino dell’Amministratore Umile in mattinata (fascia prenotata), poi pranzo e passeggiata su Pingjiang Road. Pausa nel pomeriggio, alle 17:30 Shantang Street per le lanterne. Verso le 19:30 si riprendono i bagagli e si va in taxi a Tongli (~50 min): passeggiata serale tra i canali.", points: ["suzhou-amministratore-umile", "suzhou-pingjiang-road", "suzhou-shantang-street", "tongli-canali-e-ponti"] },
+  { date: '2026-10-18', placeId: 'tongli', title: "Tongli e il lago Jinji, sera a Shanghai", plan: "Proposta: mattina presto a Tongli, prima dei gruppi, e Giardino Tuisi. Check-out, poi auto per il lago Jinji: Porta d’Oriente (riva ovest) e nuovo Museo di Arte Contemporanea visto da fuori (riva est). Nel pomeriggio treno AV dalla stazione Suzhou Industrial Park a Shanghai; check-in al Neobridge dalle 14:00.", points: ["tongli-canali-e-ponti", "tongli-giardino-tuisi", "suzhou-porta-d-oriente", "suzhou-museo-arte-contemporanea"] },
   { date: '2026-10-19', placeId: 'shanghai', title: "Shanghai", plan: "", points: [] },
   { date: '2026-10-20', placeId: 'shanghai', title: "Shanghai", plan: "", points: [] },
   { date: '2026-10-21', placeId: 'shanghai', title: "Shanghai", plan: "", points: [] },
@@ -264,6 +267,8 @@ const DAYS = [
 // 2026); 110/120/119 sono i numeri nazionali cinesi di emergenza.
 // Promemoria con data: compaiono nella pagina del giorno e in Oggi.
 const REMINDERS = [
+  { date: '2026-10-16', title: 'Oggi: prenotare il Giardino dell’Amministratore Umile e Tongli',
+    text: 'Giardino: fascia oraria di sabato 17 (verso le 9:30–10:00) col passaporto, sul mini-programma WeChat “苏州园林” o su Trip.com. Tongli: il biglietto online va comprato almeno un giorno prima (serve per la mattina del 18, Tuisi compreso).' },
   { date: '2026-10-22', title: 'Stasera alle 20:00: prenotare la Città Proibita',
     text: 'I biglietti per giovedì 29 escono oggi alle 20:00 ora di Pechino e si esauriscono in fretta: tenetevi pronti con i due passaporti e connessione (VPN se serve). Non si comprano all’ingresso.',
     link: 'https://bookingticket.dpm.org.cn' },
