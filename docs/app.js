@@ -585,13 +585,29 @@
     if (!el) return;
     if (!('serviceWorker' in navigator)) { el.textContent = 'Questo browser non supporta l’uso offline.'; return; }
     navigator.serviceWorker.getRegistration().then((reg) => {
+      const v = (document.querySelector('script[src*="app.js"]').getAttribute('src').match(/v=(\d+)/) || [])[1];
       el.innerHTML = reg && reg.active
-        ? '✅ <b>Pronta per l’uso offline.</b> Pagine, foto e caratteri sono salvati su questo telefono.'
+        ? '✅ <b>Pronta per l’uso offline.</b> Pagine, foto e caratteri sono salvati su questo telefono. Versione installata: <b>v' + v + '</b>.'
         : '⏳ Salvataggio per l’uso offline in corso: riaprite questa pagina tra qualche secondo.';
     });
   }
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+    // L'app si apre dalla copia salvata; quando sul sito c'è una versione
+    // nuova, il nuovo service worker prende il controllo e la pagina si
+    // ricarica da sola (una volta), così non serve chiudere e riaprire.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloaded) return;
+      reloaded = true;
+      location.reload();
+    });
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+        // Controlla gli aggiornamenti anche quando si torna sull'app dal background.
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+      }).catch(() => {});
+    });
   }
 
   route();
