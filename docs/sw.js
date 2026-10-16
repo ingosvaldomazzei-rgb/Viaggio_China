@@ -1,16 +1,16 @@
 // Service worker generato da tools/aggiorna_offline.py — non modificare a mano.
 // Salva l'app sul telefono per l'uso offline (e in Cina, dove github.io
 // potrebbe non essere raggiungibile) e conserva le zone di mappa visitate.
-const VERSION = 'v11-542e30a2';
+const VERSION = 'v12-72767be8';
 const CORE = 'core-' + VERSION;
 const TILES = 'tiles-v1';
 const MAX_TILES = 3000;
 const ASSETS = [
   './',
-  './app.js?v=11',
-  './data.js?v=11',
+  './app.js?v=12',
+  './data.js?v=12',
   './documenti.enc.json',
-  './fonts/fonts.css?v=11',
+  './fonts/fonts.css?v=12',
   './fonts/manrope-latin-cf48e3.woff2',
   './fonts/manrope-latin-ext-b4290e.woff2',
   './fonts/spectral-latin-0340db.woff2',
@@ -50,14 +50,14 @@ const ASSETS = [
   './photos/yangshuo-2.jpg',
   './photos/yangshuo-3.jpg',
   './photos/yangshuo-4.jpg',
-  './styles.css?v=11',
+  './styles.css?v=12',
   './vendor/leaflet/images/layers-2x.png',
   './vendor/leaflet/images/layers.png',
   './vendor/leaflet/images/marker-icon-2x.png',
   './vendor/leaflet/images/marker-icon.png',
   './vendor/leaflet/images/marker-shadow.png',
-  './vendor/leaflet/leaflet.css?v=11',
-  './vendor/leaflet/leaflet.js?v=11'
+  './vendor/leaflet/leaflet.css?v=12',
+  './vendor/leaflet/leaflet.js?v=12'
 ];
 
 self.addEventListener('install', (event) => {
