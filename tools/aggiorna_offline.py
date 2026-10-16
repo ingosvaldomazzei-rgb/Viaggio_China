@@ -5,7 +5,7 @@ Da lanciare dopo ogni modifica al sito:  python3 tools/aggiorna_offline.py
 """
 import hashlib, pathlib, re
 
-DOCS = pathlib.Path(__file__).resolve().parent.parent / 'docs'
+DOCS = pathlib.Path(__import__('os').environ.get('DOCS_DIR') or pathlib.Path(__file__).resolve().parent.parent / 'docs')
 SKIP = {'sw.js', 'README.md'}
 
 index = (DOCS / 'index.html').read_text()
