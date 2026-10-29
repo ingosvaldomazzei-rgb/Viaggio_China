@@ -386,7 +386,8 @@
     html += '<section class="section">' + (pt.summary ? '<p class="lead">' + esc(pt.summary) + '</p>'
       : '<div class="empty">Dettagli da completare: descrizione, orari, biglietti e consigli.</div>') + '</section>';
     if (pt.hours) html += section('Orari', '<div class="card"><p style="margin:0">' + esc(pt.hours) + '</p></div>');
-    if (pt.tickets) html += section('Biglietti e prenotazione', '<div class="card"><p style="margin:0">' + esc(pt.tickets) + '</p></div>');
+    if (pt.tickets || pt.docId) html += section('Biglietti e prenotazione', '<div class="card">' + (pt.tickets ? '<p style="margin:0">' + esc(pt.tickets) + '</p>' : '') +
+      (pt.docId ? '<div class="btn-row" style="margin-top:8px"><a class="btn" href="#/documenti/' + pt.docId + '">🔒 La vostra prenotazione</a></div>' : '') + '</div>');
     if (pt.tips && pt.tips.length) html += section('Consigli', '<div class="card"><ul class="checklist">' + pt.tips.map((t) => '<li>' + esc(t) + '</li>').join('') + '</ul></div>');
     const days = daysWithPoint(pt.id);
     html += section('Quando', days.length ? '<div class="list">' + days.map(dayRow).join('') + '</div>'
